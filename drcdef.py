@@ -11,7 +11,8 @@ reserved = {
     'or' : 'OR',
     'not' : 'NOT',
     'exists' : 'EXISTS',
-    'forall' : 'FORALL',}
+    'forall' : 'FORALL',
+    'exit' : 'EXIT',}
 
 tokens = [
     'LBRACE', 'RBRACE', 'BAR',
@@ -31,7 +32,7 @@ def t_NUMBER(t):
     return t
 
 def t_RESERVED(t):
-    r'and | or | exists | forall'
+    r'and | or | exists | forall | not | exit'
     t.type = reserved.get(t.value, 'BOMB')
     return t
 
@@ -132,18 +133,23 @@ def p_formula_base(p):
     'formula : atomicformula'
     print "4"
 
-def p_formula_and(p):
-    'formula : formula AND formula'
+def p_formula_comp(p):
+    '''formula : formula AND formula
+               | formula OR formula'''
+    
     print "5"
     p[0]  = DRC(p[2]) 
     dictionary.append(p[0])
 
+<<<<<<< local
+=======
 def p_formula_or(p):
     'formula : formula OR formula'
     print "6"
     p[0]  = DRC(p[2])    
     dictionary.append(p[0])
 
+>>>>>>> other
 def p_formula_nega(p):
     'formula : NOT LPAREN formula RPAREN'
     print "7"
@@ -181,6 +187,12 @@ def p_arg_item(p):
            | NUMBER'''
     print "12"
 
+def p_query_exit(p):
+    'query : EXIT'
+    print 'goodbye'
+    exit()
+
+    
 def p_error(p):
     print "Syntax error"
 
