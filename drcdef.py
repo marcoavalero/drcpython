@@ -133,10 +133,8 @@ def p_formula_base(p):
     'formula : atomicformula'
     print "4"
 
-def p_formula_comp(p):
-    '''formula : formula AND formula
-               | formula OR formula'''
-    
+def p_formula_and(p):
+    'formula : formula AND formula'
     print "5"
     p[0]  = DRC(p[2]) 
     dictionary.append(p[0])
