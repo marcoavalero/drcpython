@@ -139,15 +139,12 @@ def p_formula_and(p):
     p[0]  = DRC(p[2]) 
     dictionary.append(p[0])
 
-<<<<<<< local
-=======
 def p_formula_or(p):
     'formula : formula OR formula'
     print "6"
     p[0]  = DRC(p[2])    
     dictionary.append(p[0])
 
->>>>>>> other
 def p_formula_nega(p):
     'formula : NOT LPAREN formula RPAREN'
     print "7"
