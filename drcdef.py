@@ -189,7 +189,7 @@ def p_query_exit(p):
 
     
 def p_error(p):
-    print "Syntax error"
+    print "Syntax error, you bastards"
 
 import ply.yacc as yacc
 
