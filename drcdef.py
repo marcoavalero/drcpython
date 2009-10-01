@@ -1,11 +1,12 @@
 # CSC 6340 
+# CSC 6340 
 # Fall 2009
-
+# Marco Valero, John Daigle
 # drcdef.py
 # phase 1 grammar for DRC queries
 
 import drcobj
-
+from drcobj import DRC
 # token names
 
 reserved = {
