@@ -23,41 +23,13 @@ from drcobj import DRC
 
 start='query'
 
-def print_node(node):
-        print "-------------------"
-        print "Node type:"
-        print node.nodeType
-        print ""
-        print "Predicate name:"
-        print node.predicateName
-        print ""
-        print "Variables list:"
-        print node.varList 
-        print ""
-        print "Arguments list:"
-	if len(node.argList) == 0:
-		print "This argument list is empty"
-	else:
-		print node.argList
-        print ""
-        print "Children:"
-        count = 0
-        for item in node.children:
-            print node.children[count].nodeType
-            count=+1
-        print "-------------------"
-        count = 0
-        for item in node.children:
-            print_node(node.children[count])
-            count=+1        
-
 def p_query(p):
     'query :  LBRACE varlist BAR formula RBRACE'
     print "1"
     p[0]  = DRC("Query")
     p[0].set_varlist(p[2])
     p[0].set_children(p[4])
-    print_node(p[0]) 
+    p[0].print_node() 
 
 def p_varlist_name(p):
     'varlist : NAME'
