@@ -1,8 +1,8 @@
 class DRC(object):
     def __init__(self, nodeType):
         self.nodeType = nodeType
-        print "%s DRCNode created" % self.nodeType
-        self.predicateName = "tablename"
+        #print "%s DRCNode created" % self.nodeType
+        self.predicateName = "none"
         self.children = []
         self.argList = []
         self.varList = []
