@@ -35,7 +35,10 @@ def print_node(node):
         print node.varList 
         print ""
         print "Arguments list:"
-        print node.argList
+	if len(node.argList) == 0:
+		print "This argument list is empty"
+	else:
+		print node.argList
         print ""
         print "Children:"
         count = 0
@@ -105,7 +108,6 @@ def p_atomicformula_name(p):
     p[0]  = DRC("Predicate")
     p[0].set_predicate(p[1])
     p[0].set_arglist(p[3])
-    print p[3]
 
 def p_atomicformula_comparison(p):
     'atomicformula : arg COMPARISON arg'

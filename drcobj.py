@@ -24,17 +24,17 @@ class DRC(object):
     def set_varlist(self, varlist):
         self.varList.append(varlist)
 
-    def set_arglist(self, leftop):
-        self.leftOperand.append(leftop)
+#    def set_arglist(self, leftop):
+ #       self.leftOperand.append(leftop)
 
-    def set_arglist(self, leftop_type):
-        self.leftOperandType.append(leftop_type)
+  #  def set_arglist(self, leftop_type):
+   #     self.leftOperandType.append(leftop_type)
 
-    def set_arglist(self, rightop):
-        self.rightOperand.append(rightop)
+#    def set_arglist(self, rightop):
+#        self.rightOperand.append(rightop)
 
-    def set_arglist(self, rightop_type):
-        self.rightOperandType.append(rightop_type)
+#    def set_arglist(self, rightop_type):
+ #       self.rightOperandType.append(rightop_type)
 
-    def set_arglist(self, operator):
-        self.operator.append(operator)
+ #   def set_arglist(self, operator):
+  #      self.operator.append(operator)
