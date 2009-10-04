@@ -12,6 +12,12 @@ class DRC(object):
         self.rightOperand = []
         self.rightOperandType = []
 
+#    def __del__(self):
+        #print "%s DRCNode removed" % self.nodeType
+
+    def set_type(self, nodeType):
+        self.nodeType = nodeType
+
     def set_predicate(self, pName):
         self.predicateName = pName
 
@@ -24,42 +30,43 @@ class DRC(object):
     def set_varlist(self, varlist):
         self.varList.append(varlist)
 
-#    def set_arglist(self, leftop):
-#       self.leftOperand.append(leftop)
+    def set_leftop(self, leftop):
+        self.leftOperand.append(leftop)
 
-#  def set_arglist(self, leftop_type):
-#     self.leftOperandType.append(leftop_type)
+    def set_leftop_type(self, leftop_type):
+        self.leftOperandType.append(leftop_type)
 
-#    def set_arglist(self, rightop):
-#        self.rightOperand.append(rightop)
+    def set_rightop(self, rightop):
+        self.rightOperand.append(rightop)
 
-#    def set_arglist(self, rightop_type):
-#       self.rightOperandType.append(rightop_type)
+    def set_rightop_type(self, rightop_type):
+        self.rightOperandType.append(rightop_type)
 
-#   def set_arglist(self, operator):
-#      self.operator.append(operator)
+    def set_operator(self, operator):
+        self.operator.append(operator)
 
         
     def print_node(self):
-        print "-------Node------------"
+        print "------------DRCNode------------"
         print "Node type: ", self.nodeType
-        print "Predicate name:", self.predicateName
-        print "\nVariables list:", self.varList 
-        if len(self.argList) == 0:
-            arrg = "This argument list is empty"
-        else:
-            arrg = 'There are %d arguments: ' % len(self.argList)
-            for i in self.argList:
-                arrg = arrg + "{" + i + ", " + str(type(i)) + "}\n"
+        if self.nodeType == "Predicate":
+            print "Predicate name:", self.predicateName
+        if len(self.varList) > 0:
+            print "Variables list:", self.varList 
+        if len(self.argList) > 0:
+            print "Arguments list:", self.argList
+        if len(self.children) > 0:
+            print "Children:"
+            count = 0
+            for item in self.children:
+                print self.children[count].nodeType
+                count=+1               
+        if self.nodeType == "Comparison":
+            print "Left operand:", self.leftOperand
+            print "Operator:", self.operator
+            print "Right operand:", self.rightOperand
 
-        print "\nArguments list:", arrg
-        print "\nChildren:"
-        count = 0
-        for item in self.children:
-            print self.children[count].nodeType
-            count=+1
-               
-        print "-------------------\n"
+        print "-------------------------------\n"
         count = 0
         for item in self.children:
             self.children[count].print_node()

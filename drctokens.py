@@ -14,16 +14,21 @@ reserved = {
     'not' : 'NOT',
     'exists' : 'EXISTS',
     'forall' : 'FORALL',
-    'exit' : 'EXIT',}
+    'exit' : 'EXIT',
+    '<=' : 'LESSEQ',
+    '>=' : 'GREAEQ',
+    '<>' : 'DIFFERENT',}
 
 tokens = [
     'LBRACE', 'RBRACE', 'BAR',
     'LPAREN', 'RPAREN',
     'COMMA', 
-    'COMPARISON',
+    'LESS',
+    'GREAT',
+    'EQUAL',
     'NAME', 'NUMBER', 'STRING'] + list(reserved.values())
 
-literals = ['=','<','>','{','}', '(',')','|',',']
+literals = ['{','}', '(',')','<','>', '=','|',',']
 
 #Tokens
 
@@ -34,7 +39,7 @@ def t_NUMBER(t):
     return t
 
 def t_RESERVED(t):
-    r'and | or | exists | forall | not | exit'
+    r'and | or | exists | forall | not | exit | <= | >= | <>'
     t.type = reserved.get(t.value, 'BOMB')
     return t
 
@@ -42,6 +47,9 @@ t_LBRACE = r'\{'
 t_RBRACE = r'\}'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
+t_LESS = r'\<'
+t_GREAT = r'\>'
+t_EQUAL = r'\='
 t_BAR = r'\|'
 t_COMMA = r','
 t_NAME    = r'[a-zA-Z_][a-zA-Z0-9_]*'
