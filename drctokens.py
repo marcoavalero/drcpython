@@ -20,10 +20,8 @@ tokens = [
     'LBRACE', 'RBRACE', 'BAR',
     'LPAREN', 'RPAREN',
     'COMMA', 
-    'COMPARISON',
     'NAME', 'NUMBER', 'STRING'] + list(reserved.values())
 
-literals = ['=','<','>','{','}', '(',')','|',',']
 
 #Tokens
 
@@ -34,7 +32,7 @@ def t_NUMBER(t):
     return t
 
 def t_RESERVED(t):
-    r'and | or | exists | forall | not | exit'
+    r'and | or | exists | forall | not | exit | <= | >= | <> | < | > | ='
     t.type = reserved.get(t.value, 'BOMB')
     return t
 
