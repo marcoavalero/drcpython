@@ -14,7 +14,13 @@ reserved = {
     'not' : 'NOT',
     'exists' : 'EXISTS',
     'forall' : 'FORALL',
-    'exit' : 'EXIT',}
+    'exit' : 'EXIT',
+    '<=' : 'LESSEQ',
+    '>=' : 'GREAEQ',
+    '<>' : 'DIFFERENT',
+    '<' : 'LESS',
+    '>' : 'GREAT',
+    '=' : 'EQUAL',}
 
 tokens = [
     'LBRACE', 'RBRACE', 'BAR',
@@ -43,8 +49,7 @@ t_RPAREN = r'\)'
 t_BAR    = r'\|'
 t_COMMA  = r','
 t_NAME   = r'[a-zA-Z_][a-zA-Z0-9_]*'
-t_NUMBER = r'[1-9][0-9]*'
-t_STRING = r"\'[a-Z0-9]*\'"
+t_STRING = r"\'[^']*\'"
 t_ignore = " \t"
 
 def t_newline(t):

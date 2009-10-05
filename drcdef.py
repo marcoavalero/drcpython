@@ -5,6 +5,7 @@
 # drcdef.py
 # phase 1 grammar for DRC queries
 
+#module for the yacc file
     
 # Build the lexer
 import drctokens
