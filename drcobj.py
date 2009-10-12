@@ -24,6 +24,12 @@ class DRC(object):
     def set_children(self, child):
         self.children.append(child)
 
+    def add_children(self, children):
+        self.children = self.children + children
+
+    def del_children(self, child):
+        self.children.remove(child)
+
     def set_arglist(self, arglist):
         self.argList.append(arglist)
 
@@ -71,3 +77,35 @@ class DRC(object):
         for item in self.children:
             self.children[count].print_node()
             count=+1        
+
+
+
+    def reduceand(self):
+       if self.children[1].nodeType == "and":
+           object = DRC("object")
+           object = self.children[1]
+           self.del_children(self.children[1])
+           print "Self Children before:"
+           self.print_node()
+           self.children.extend(object.reduceand().children)
+           print "Self Children after:"
+           self.print_node()
+       print "Returning:"
+       self.print_node()
+       return self
+
+    def marco(self):
+       count = 0
+       for item in self.children[1].children:
+           self.set_children(self.children[1].children[count])
+           print count
+           count =+ 1
+
+
+    def reducetree(self):
+        count = 0
+        for item in self.children:
+            if self.children[count].nodeType == "and":
+               self.children[count].reduceand()     
+               count=+1
+
