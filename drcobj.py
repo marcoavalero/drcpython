@@ -106,7 +106,16 @@ class DRC(object):
             self.reduceor() 
 
     def demorganreduction(self):
-        print ("De Morgan")
+        if self.nodeType == "not" and self.children[0].nodeType == "or":
+            count = 0
+            for item in self.children[0].children:
+                notnode  = DRC("not")  
+                notnode.set_children(self.children[0].children[count])
+                self.children.append(notnode)
+                count = count + 1
+            self.del_children(self.children[0])
+            self.set_type("and")
+
 
     def doublenotreduction(self):
         print ("Double not")
