@@ -12,6 +12,7 @@ import drctokens
 import ply.lex as lex
 from drctokens import tokens
 lex.lex(module=drctokens)
+
 # Dictionary and DRCNode counter
 import drcobj
 from drcobj import DRC
@@ -127,17 +128,6 @@ def p_query_exit(p):
 def p_error(p):
     print "Syntax error"
 
-import ply.yacc as yacc
 
-yacc.yacc()
-
-while True:
-    try:
-        s = raw_input('DRC> ')
-    except EOFError:
-        break
-    if s == "exit":
-        break
-    yacc.parse(s)
     
 
