@@ -118,7 +118,15 @@ class DRC(object):
 
 
     def doublenotreduction(self):
-        print ("Double not")
+        count = 0
+        for item in self.children:
+            if self.children[count].nodeType == "not":
+                if self.children[count].children[0].nodeType == "not":
+                    self.children.append(self.children[count].children[0].children[0])
+                    self.del_children(self.children[count]) 
+                    self.doublenotreduction()
+            count = count + 1
+       
 
     def reducetree(self,action):
         if action == 1:
