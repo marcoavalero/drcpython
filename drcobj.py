@@ -78,11 +78,15 @@ class DRC(object):
             self.children[count].print_node()
             count = count + 1        
 
-
+    def reduceor(self):
+       if self.children[1].children[1].nodeType == "or":
+           self.children[1].reduceor()
+           self.copy_my_child_children()
+       else:
+           self.copy_my_child_children()
 
     def reduceand(self):
        if self.children[1].children[1].nodeType == "and":
-           print "Reducing Again"
            self.children[1].reduceand()
            self.copy_my_child_children()
        else:
@@ -91,23 +95,15 @@ class DRC(object):
     def copy_my_child_children(self):
        count = 0
        for item in self.children[1].children:
-           print "Copying child %d " % count
-           print self.children[1].children[count].argList
-           print ""
            self.children.append(self.children[1].children[count])
            count = count + 1
-       print "Removing child " + self.children[1].nodeType
        self.del_children(self.children[1])
-       print "Returning to function"
 
     def checknodereduction(self):
-        print "I am " + self.nodeType
         if self.nodeType == "and" and self.children[1].nodeType == "and":
-            print "Reducing and"
             self.reduceand()     
         if self.nodeType == "or" and self.children[1].nodeType == "or":
-            print "Reducing or"
-            self.reduceand() 
+            self.reduceor() 
 
     def reducetree(self):
         self.checknodereduction()
