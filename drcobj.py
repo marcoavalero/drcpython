@@ -66,7 +66,7 @@ class DRC(object):
             count = 0
             for item in self.children:
                 print self.children[count].nodeType
-                count=+1               
+                count = count + 1               
         if self.nodeType == "Comparison":
             print "Left operand:", self.leftOperand
             print "Operator:", self.operator
@@ -76,36 +76,44 @@ class DRC(object):
         count = 0
         for item in self.children:
             self.children[count].print_node()
-            count=+1        
+            count = count + 1        
 
 
 
     def reduceand(self):
-       if self.children[1].nodeType == "and":
-           object = DRC("object")
-           object = self.children[1]
-           self.del_children(self.children[1])
-           print "Self Children before:"
-           self.print_node()
-           self.children.extend(object.reduceand().children)
-           print "Self Children after:"
-           self.print_node()
-       print "Returning:"
-       self.print_node()
-       return self
+       if self.children[1].children[1].nodeType == "and":
+           print "Reducing Again"
+           self.children[1].reduceand()
+           self.copy_my_child_children()
+       else:
+           self.copy_my_child_children()
 
-    def marco(self):
+    def copy_my_child_children(self):
        count = 0
        for item in self.children[1].children:
-           self.set_children(self.children[1].children[count])
-           print count
-           count =+ 1
+           print "Copying child %d " % count
+           print self.children[1].children[count].argList
+           print ""
+           self.children.append(self.children[1].children[count])
+           count = count + 1
+       print "Removing child " + self.children[1].nodeType
+       self.del_children(self.children[1])
+       print "Returning to function"
 
+    def checknodereduction(self):
+        print "I am " + self.nodeType
+        if self.nodeType == "and" and self.children[1].nodeType == "and":
+            print "Reducing and"
+            self.reduceand()     
+        if self.nodeType == "or" and self.children[1].nodeType == "or":
+            print "Reducing or"
+            self.reduceand() 
 
     def reducetree(self):
+        self.checknodereduction()
         count = 0
         for item in self.children:
-            if self.children[count].nodeType == "and":
-               self.children[count].reduceand()     
-               count=+1
+            self.children[count].reducetree()     
+            count = count +1
+            
 
