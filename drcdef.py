@@ -31,7 +31,8 @@ def p_query(p):
     p[0] = p[2]
     p[0].set_type("Query")
     p[0].set_children(p[4])
-    p[0].print_node() 
+    p[0].reducetree() 
+#    p[0].print_node() 
 
 def p_varlist_name(p):
     'varlist : NAME'
