@@ -105,11 +105,30 @@ class DRC(object):
         if self.nodeType == "or" and self.children[1].nodeType == "or":
             self.reduceor() 
 
-    def reducetree(self):
-        self.checknodereduction()
+    def demorganreduction(self):
+        print ("De Morgan")
+
+    def doublenotreduction(self):
+        print ("Double not")
+
+    def reducetree(self,action):
+        if action == 1:
+            self.checknodereduction()
+        if action == 2:
+            self.demorganreduction()            
+        if action == 3:
+            self.doublenotreduction() 
         count = 0
         for item in self.children:
-            self.children[count].reducetree()     
-            count = count +1
+            self.children[count].reducetree(action)     
+            count = count + 1
             
+    def reduce(self):
+        self.reducetree(1)
+
+    def demorgan(self):
+        self.reducetree(2)
+
+    def doublenot(self):
+        self.reducetree(3)
 
