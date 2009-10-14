@@ -107,11 +107,47 @@ class DRC(object):
         if self.nodeType == "or":
             self.reduceor() 
 
-    def reducetree(self):
-        self.checknodereduction()
+    def demorganreduction(self):
+        if self.nodeType == "not" and self.children[0].nodeType == "or":
+            count = 0
+            for item in self.children[0].children:
+                notnode  = DRC("not")  
+                notnode.set_children(self.children[0].children[count])
+                self.children.append(notnode)
+                count = count + 1
+            self.del_children(self.children[0])
+            self.set_type("and")
+
+
+    def doublenotreduction(self):
         count = 0
         for item in self.children:
-            self.children[count].reducetree()     
-            count = count +1
+            if self.children[count].nodeType == "not":
+                if self.children[count].children[0].nodeType == "not":
+                    self.children.append(self.children[count].children[0].children[0])
+                    self.del_children(self.children[count]) 
+                    self.doublenotreduction()
+            count = count + 1
+       
+
+    def reducetree(self,action):
+        if action == 1:
+            self.checknodereduction()
+        if action == 2:
+            self.demorganreduction()            
+        if action == 3:
+            self.doublenotreduction() 
+        count = 0
+        for item in self.children:
+            self.children[count].reducetree(action)     
+            count = count + 1
             
+    def reduce(self):
+        self.reducetree(1)
+
+    def demorgan(self):
+        self.reducetree(2)
+
+    def doublenot(self):
+        self.reducetree(3)
 
