@@ -79,30 +79,32 @@ class DRC(object):
             count = count + 1        
 
     def reduceor(self):
-       if self.children[1].children[1].nodeType == "or":
-           self.children[1].reduceor()
-           self.copy_my_child_children()
-       else:
-           self.copy_my_child_children()
+      newNode = self.children.pop()
+      if newNode.nodeType != "or":
+          self.children.append(newNode)
+      else:
+          self.children.extend(newNode.reduceor())
+      return self.children
 
     def reduceand(self):
-       if self.children[1].children[1].nodeType == "and":
-           self.children[1].reduceand()
-           self.copy_my_child_children()
+       newNode = self.children.pop()
+       if newNode.nodeType != "and":
+           self.children.append(newNode)
        else:
-           self.copy_my_child_children()
+           self.children.extend(newNode.reduceand())
+       return self.children
 
-    def copy_my_child_children(self):
-       count = 0
-       for item in self.children[1].children:
-           self.children.append(self.children[1].children[count])
-           count = count + 1
-       self.del_children(self.children[1])
-
+#    def copy_my_child_children(self):
+#        count = 1
+#        for item in self.children:
+#            self.children.append(self.children[count])
+#            count = count + 1
+#            self.del_children(self.children[1])
+            
     def checknodereduction(self):
-        if self.nodeType == "and" and self.children[1].nodeType == "and":
+        if self.nodeType == "and":
             self.reduceand()     
-        if self.nodeType == "or" and self.children[1].nodeType == "or":
+        if self.nodeType == "or":
             self.reduceor() 
 
     def reducetree(self):
