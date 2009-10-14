@@ -130,7 +130,7 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    argg = Arg(type="Name", value=p[1])
+    argg = Arg(type="NAME", value=p[1])
     p[0].set_arglist(argg)
 #    print "12"
 

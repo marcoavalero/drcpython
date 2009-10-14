@@ -9,7 +9,10 @@ class metaPrintCleaner(type):
         def __repr__(self):
             rep = ['%s=%r' %(k, getattr(self, k)) for k in self.__dflts__ if getattr(self, k) != self.__dflts__[k]]
             return '%s(%s)' %(classname, ', '.join(rep))
-        newdict = {'__slots__':[], '__dflts__':{}, '__init__':__init__, '__repr__':__repr__,}
+        def __str__(self):
+            rep = ['%s' %(getattr(self, k)) for k in self.__dflts__ if getattr(self, k) != self.__dflts__[k]]
+            return '%s' %(': '.join(rep))
+        newdict = {'__slots__':[], '__dflts__':{}, '__init__':__init__, '__repr__':__repr__,'__str__':__str__,}
         for k in classdict:
             if k.startswith('__') and k.endswith('__'):
                 if k in newdict:

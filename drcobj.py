@@ -53,14 +53,13 @@ class DRC(object):
 
         
     def print_node(self):
-        print "------------DRCNode------------"
-        print "Node type: ", self.nodeType
+        print "------------DRCNode:", self.nodeType, "------------"
         if self.nodeType == "Predicate":
             print "Predicate name:", self.predicateName
         if len(self.varList) > 0:
             print "Variables list:", self.varList 
         if len(self.argList) > 0:
-            print "Arguments list:", self.argList
+            print "Arguments list:", (map(str,self.argList))
         if len(self.children) > 0:
             print "Children:"
             count = 0
