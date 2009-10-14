@@ -16,6 +16,8 @@ lex.lex(module=drctokens)
 # Dictionary and DRCNode counter
 import drcobj
 from drcobj import DRC
+import drcarg
+from drcarg import Arg
 #vars = {}
 #args = {}
 # dictionary = []
@@ -125,13 +127,24 @@ def p_arglist_group(p):
 #    del p[1]
 #    print "11b"
 
-def p_arg_item(p):
-    '''arg : NAME 
-           | STRING 
-           | NUMBER'''
+def p_arg_item_name(p):
+    'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    p[0].set_arglist(p[1])
+    argg = Arg(type="NAME", value=p[1])
+    p[0].set_arglist(argg)
 #    print "12"
+
+def p_arg_item_number(p):
+    'arg : NUMBER'
+    p[0]  = DRC("TempArgNode")
+    argg = Arg(type="NUMBER", value=p[1])
+    p[0].set_arglist(argg)
+
+def p_arg_item_string(p):
+    'arg : STRING' 
+    p[0]  = DRC("TempArgNode")
+    argg = Arg(type="STRING", value=p[1])
+    p[0].set_arglist(argg)
 
 def p_query_exit(p):
     'query : EXIT'
