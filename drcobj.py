@@ -24,6 +24,12 @@ class DRC(object):
     def set_children(self, child):
         self.children.append(child)
 
+    def add_children(self, children):
+        self.children = self.children + children
+
+    def del_children(self, child):
+        self.children.remove(child)
+
     def set_arglist(self, arglist):
         self.argList.append(arglist)
 
@@ -47,20 +53,19 @@ class DRC(object):
 
         
     def print_node(self):
-        print "------------DRCNode------------"
-        print "Node type: ", self.nodeType
+        print "------------DRCNode:", self.nodeType, "------------"
         if self.nodeType == "Predicate":
             print "Predicate name:", self.predicateName
         if len(self.varList) > 0:
             print "Variables list:", self.varList 
         if len(self.argList) > 0:
-            print "Arguments list:", self.argList
+            print "Arguments list:", (map(str,self.argList))
         if len(self.children) > 0:
             print "Children:"
             count = 0
             for item in self.children:
                 print self.children[count].nodeType
-                count=+1               
+                count = count + 1               
         if self.nodeType == "Comparison":
             print "Left operand:", self.leftOperand
             print "Operator:", self.operator
@@ -70,4 +75,78 @@ class DRC(object):
         count = 0
         for item in self.children:
             self.children[count].print_node()
-            count=+1        
+            count = count + 1        
+
+    def reduceor(self):
+      newNode = self.children.pop()
+      if newNode.nodeType != "or":
+          self.children.append(newNode)
+      else:
+          self.children.extend(newNode.reduceor())
+      return self.children
+
+    def reduceand(self):
+       newNode = self.children.pop()
+       if newNode.nodeType != "and":
+           self.children.append(newNode)
+       else:
+           self.children.extend(newNode.reduceand())
+       return self.children
+
+#    def copy_my_child_children(self):
+#        count = 1
+#        for item in self.children:
+#            self.children.append(self.children[count])
+#            count = count + 1
+#            self.del_children(self.children[1])
+            
+    def checknodereduction(self):
+        if self.nodeType == "and":
+            self.reduceand()     
+        if self.nodeType == "or":
+            self.reduceor() 
+
+    def demorganreduction(self):
+        if self.nodeType == "not" and self.children[0].nodeType == "or":
+            count = 0
+            for item in self.children[0].children:
+                notnode  = DRC("not")  
+                notnode.set_children(self.children[0].children[count])
+                self.children.append(notnode)
+                count = count + 1
+            self.del_children(self.children[0])
+            self.set_type("and")
+
+
+    def doublenotreduction(self):
+        count = 0
+        for item in self.children:
+            if self.children[count].nodeType == "not":
+                if self.children[count].children[0].nodeType == "not":
+                    self.children.append(self.children[count].children[0].children[0])
+                    self.del_children(self.children[count]) 
+                    self.doublenotreduction()
+            count = count + 1
+       
+
+    def reducetree(self,action):
+        if action == 1:
+            self.checknodereduction()
+        if action == 2:
+            self.demorganreduction()            
+        if action == 3:
+            self.doublenotreduction() 
+        count = 0
+        for item in self.children:
+            self.children[count].reducetree(action)     
+            count = count + 1
+            
+    def reduce(self):
+        self.reducetree(1)
+
+    def demorgan(self):
+        self.reducetree(2)
+
+    def doublenot(self):
+        self.reducetree(3)
+
