@@ -141,12 +141,10 @@ class DRC(object):
             self.children[count].reducetree(action)     
             count = count + 1
             
-    def reduce(self):
+
+    def prune_tree(self):
+        self.reducetree(3)
         self.reducetree(1)
-
-    def demorgan(self):
         self.reducetree(2)
-
-    def doublenot(self):
         self.reducetree(3)
 
