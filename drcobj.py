@@ -1,3 +1,5 @@
+from drcarg import *
+
 class DRC(object):
     def __init__(self, nodeType):
         self.nodeType = nodeType
@@ -77,20 +79,20 @@ class DRC(object):
             self.children[count].print_node()
             count = count + 1        
 
-    def reduceor(self):
+    def reduce_or(self):
       newNode = self.children.pop()
       if newNode.nodeType != "or":
           self.children.append(newNode)
       else:
-          self.children.extend(newNode.reduceor())
+          self.children.extend(newNode.reduce_or())
       return self.children
 
-    def reduceand(self):
+    def reduce_and(self):
        newNode = self.children.pop()
        if newNode.nodeType != "and":
            self.children.append(newNode)
        else:
-           self.children.extend(newNode.reduceand())
+           self.children.extend(newNode.reduce_and())
        return self.children
 
 #    def copy_my_child_children(self):
@@ -100,13 +102,17 @@ class DRC(object):
 #            count = count + 1
 #            self.del_children(self.children[1])
             
-    def checknodereduction(self):
+    def check_node_reduction(self):
         if self.nodeType == "and":
-            self.reduceand()     
+            self.reduce_and()     
         if self.nodeType == "or":
-            self.reduceor() 
+            self.reduce_or() 
+            if not (self.type_check_or()):
+                print "TYPE FAIL!" #Debug line
+            else:
+                print "TYPE WIN!" # Debug line
 
-    def demorganreduction(self):
+    def demorgan_reduction(self):
         if self.nodeType == "not" and self.children[0].nodeType == "or":
             count = 0
             for item in self.children[0].children:
@@ -118,33 +124,51 @@ class DRC(object):
             self.set_type("and")
 
 
-    def doublenotreduction(self):
+    def double_not_reduction(self):
         count = 0
         for item in self.children:
             if self.children[count].nodeType == "not":
                 if self.children[count].children[0].nodeType == "not":
                     self.children.append(self.children[count].children[0].children[0])
                     self.del_children(self.children[count]) 
-                    self.doublenotreduction()
+                    self.double_not_reduction()
             count = count + 1
        
 
-    def reducetree(self,action):
+    def reduce_tree(self,action):
         if action == 1:
-            self.checknodereduction()
+            self.check_node_reduction()
         if action == 2:
-            self.demorganreduction()            
+            self.demorgan_reduction()            
         if action == 3:
-            self.doublenotreduction() 
+            self.double_not_reduction() 
         count = 0
         for item in self.children:
-            self.children[count].reducetree(action)     
+            self.children[count].reduce_tree(action)     
             count = count + 1
             
 
+    def type_check_or(self):
+        allVariable= []
+        eachVariable = []
+        for item in self.children:
+            for arg in item.argList:
+                if type(arg) == DRC_Var:
+                    allVariable.append(arg)
+        byVariable = set(allVariable)
+        print map(str, byVariable) #debug line
+        print map(str, allVariable) #debug line
+        truthTable = [(verify(x,y)) for x in byVariable for y in allVariable]
+        truthTable = filter((lambda a: a == False), truthTable)
+        if len(truthTable) > 0:
+            return False
+        else:
+            return True
+               
+        
     def prune_tree(self):
-        self.reducetree(3)
-        self.reducetree(1)
-        self.reducetree(2)
-        self.reducetree(3)
+        self.reduce_tree(3)
+        self.reduce_tree(1)
+        self.reduce_tree(2)
+        self.reduce_tree(3)
 

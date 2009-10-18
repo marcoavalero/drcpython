@@ -8,6 +8,7 @@
 #module for the yacc file
     
 # Build the lexer
+import random
 import drctokens
 import ply.lex as lex
 from drctokens import tokens
@@ -17,7 +18,7 @@ lex.lex(module=drctokens)
 import drcobj
 from drcobj import DRC
 import drcarg
-from drcarg import Arg
+from drcarg import *
 #vars = {}
 #args = {}
 # dictionary = []
@@ -128,20 +129,22 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    argg = Arg(type="NAME", value=p[1])
+    #    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
+    #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
     p[0].set_arglist(argg)
-#    print "12"
+    #    print "12"
 
 def p_arg_item_number(p):
     'arg : NUMBER'
     p[0]  = DRC("TempArgNode")
-    argg = Arg(type="NUMBER", value=p[1])
+    argg = Int_Con(data=p[1])
     p[0].set_arglist(argg)
 
 def p_arg_item_string(p):
     'arg : STRING' 
     p[0]  = DRC("TempArgNode")
-    argg = Arg(type="STRING", value=p[1])
+    argg = Str_Con(data=p[1])
     p[0].set_arglist(argg)
 
 def p_query_exit(p):
