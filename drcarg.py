@@ -11,7 +11,7 @@ class metaPrintCleaner(type):
             return '%s(%s)' %(classname, ', '.join(rep))
         def __str__(self):
             rep = ['%s' %(getattr(self, k)) for k in self.__dflts__ if getattr(self, k) != self.__dflts__[k]]
-            return '%s' %(': '.join(rep))
+            return '<%s:%s>' %(classname,', '.join(rep))
         newdict = {'__slots__':[], '__dflts__':{}, '__init__':__init__, '__repr__':__repr__,'__str__':__str__,}
         for k in classdict:
             if k.startswith('__') and k.endswith('__'):
@@ -28,6 +28,29 @@ class PrintCleaner(object):
     __metaclass__= metaPrintCleaner
 
 
-class Arg(PrintCleaner):
-    type = "Untyped"
-    value = "None"
+class Str_Con(PrintCleaner):
+    data = "None"
+
+
+class Int_Con(PrintCleaner):
+    data = ""
+
+class DRC_Var(PrintCleaner):
+    idid = "$"
+    type = "UKNOWN"
+    data = ""    
+    free = True
+    limited = True
+    def __eq__(self, other):
+        return self.idid == other.idid
+    def __hash__(self):
+        return sum(map(ord, self.idid))        
+    def __ne__(self, other):
+        return self.idid != other.idid
+
+def verify(one, two):
+    if one == two:
+        return type_check(one, two)
+
+def type_check(one, two):
+    return one.type == two.type
