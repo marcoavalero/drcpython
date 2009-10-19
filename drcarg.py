@@ -39,6 +39,8 @@ class DRC_Var(PrintCleaner):
     idid = "$"
     type = "UKNOWN"
     data = ""    
+    free = True
+    limited = True
     def __eq__(self, other):
         return self.idid == other.idid
     def __hash__(self):
