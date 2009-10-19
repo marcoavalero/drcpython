@@ -2,6 +2,8 @@ import sys
 import drcdef
 import ply.yacc as yacc
 from drcdef import *
+from drcerr import *
+
 yacc.yacc(module=drcdef)
 
 def main():
@@ -12,6 +14,9 @@ def main():
             break
         if s == "exit":
             break
-        yacc.parse(s)
+        try:
+            yacc.parse(s)
+        except UnmatchedVariableError:
+            continue
 
 main()

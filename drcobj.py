@@ -1,5 +1,5 @@
 from drcarg import *
-
+from drcerr import *
 class DRC(object):
     def __init__(self, nodeType):
         self.nodeType = nodeType
@@ -79,31 +79,53 @@ class DRC(object):
             self.children[count].print_node()
             count = count + 1        
 
-    def reduce_or(self):
-      newNode = self.children.pop()
-      if newNode.nodeType != "or":
-          self.children.append(newNode)
-      else:
-          self.children.extend(newNode.reduce_or())
-      return self.children
-
-    def reduce_and(self):
-       newNode = self.children.pop()
-       if newNode.nodeType != "and":
-           self.children.append(newNode)
-       else:
-           self.children.extend(newNode.reduce_and())
-       return self.children
+## ========= CONTROL ROUTINES ==================== ##
+            
+    def prune_tree(self):
+        self.reduce_tree(3)
+        self.reduce_tree(1)
+        self.reduce_tree(2)
+        self.reduce_tree(3)
 
     def check_node_reduction(self):
         if self.nodeType == "and":
             self.reduce_and()     
         if self.nodeType == "or":
             self.reduce_or() 
-            if not (self.type_check_or()):
-                print "TYPE FAIL!" #Debug line
-            else:
-                print "TYPE WIN!" # Debug line
+            self.safety_check_or()
+            self.type_check()
+
+
+## ========= REDUCTION ROUTINES ===================##
+
+    def reduce_tree(self,action):
+        if action == 1:
+            self.check_node_reduction()
+        if action == 2:
+            self.demorgan_reduction()            
+        if action == 3:
+            self.double_not_reduction() 
+        count = 0
+        for item in self.children:
+            self.children[count].reduce_tree(action)     
+            count = count + 1
+
+    def reduce_or(self):
+        newNode = self.children.pop()
+        if newNode.nodeType != "or":
+            self.children.append(newNode)
+        else:
+            self.children.extend(newNode.reduce_or())
+        return self.children
+        
+    def reduce_and(self):
+        newNode = self.children.pop()
+        if newNode.nodeType != "and":
+            self.children.append(newNode)
+        else:
+            self.children.extend(newNode.reduce_and())
+        return self.children
+
 
     def demorgan_reduction(self):
         if self.nodeType == "not" and self.children[0].nodeType == "or":
@@ -126,28 +148,27 @@ class DRC(object):
                     self.del_children(self.children[count]) 
                     self.double_not_reduction()
             count = count + 1
-       
 
-    def reduce_tree(self,action):
-        if action == 1:
-            self.check_node_reduction()
-        if action == 2:
-            self.demorgan_reduction()            
-        if action == 3:
-            self.double_not_reduction() 
-        count = 0
+## =============== SAFETY CHECKS ============== ##
+
+    def safety_check_or(self):
+        allVariable = self.get_free_from_subtree()
+        byVariable = set(allVariable)
         for item in self.children:
-            self.children[count].reduce_tree(action)     
-            count = count + 1
-            
+            vars = filter((lambda a: type(a) == DRC_Var and a.free == True), item.argList)
+            if len(byVariable) == len(vars) and byVariable - set(vars) == set([]):
+                continue
+            else:
+                mySet = byVariable - set(vars)
+                mySet = map((lambda a: a.idid), mySet)
+                print "Unmatched Variable in Predicate: %s" % (mySet)
+                raise UnmatchedVariableError
 
-    def type_check_or(self):
-        allVariable= []
+## =============== TYPE CHECK ROUTINES ======== ##
+
+    def type_check(self):
+        allVariable= self.get_free_from_subtree()
         eachVariable = []
-        for item in self.children:
-            for arg in item.argList:
-                if type(arg) == DRC_Var:
-                    allVariable.append(arg)
         byVariable = set(allVariable)
         print map(str, byVariable) #debug line
         print map(str, allVariable) #debug line
@@ -159,9 +180,14 @@ class DRC(object):
             return True
                
         
-    def prune_tree(self):
-        self.reduce_tree(3)
-        self.reduce_tree(1)
-        self.reduce_tree(2)
-        self.reduce_tree(3)
+## ============ Usefull Subroutines ==============##
 
+    def get_free_from_subtree(self):
+        allVariable = []
+        for item in self.children:
+            for arg in item.argList:
+                if type(arg) == DRC_Var and arg.free == True:
+                    allVariable.append(arg)
+                elif type(arg) == DRC:
+                    allVariable.extend(arg.get_free_from_subtree())
+        return allVariable
