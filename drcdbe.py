@@ -12,20 +12,31 @@ columnshash = {}
 argumenthash = {}
 
 cursor.execute( "select tbl_name from sqlite_master where type = 'table'" )
-list_tables = cursor.fetchall()
-for table_name in list_tables :
-    tablenames.append(table_name[0])
+listoftables = cursor.fetchall()
+for tablename in listoftables :
+    tablenames.append(tablename[0])
 
-for tables in tablenames :
-    cursor1.execute("pragma table_info("+tables+")")
+for tablename in tablenames :
+    cursor1.execute("pragma table_info("+tablename+")")
     columns = cursor1.fetchall()
-    print '-'*60
-    print tables
-    print len(columns)
-    columnshash[tables] = len(columns)
-    cursor2.execute("pragma table_info("+tables+")")
-    for row in cursor2:
-        print 'Name: ', row[1], ' Type: ', row[2]
-print columnshash
+    columnshash[tablename] = len(columns)
+
+children = DRC("EMPTY")
+for tablename in tablenames :
+    drcobject  = DRC("Predicate")
+    drcobject.set_predicate(tablename)
+    drcobject.set_children(children)
+    cursor2.execute("pragma table_info("+tablename+")")
+    for columninfo in cursor2:
+        if(columninfo[2] == "TEXT"):
+            argg = Str_Con(data=columninfo[1])
+        if(columninfo[2] == "INTEGER"):
+            argg = Int_Con(data=columninfo[1])
+        else:
+            argg = DRC_Var(idid=columninfo[1])
+        drcobject.set_arglist(argg)
+    children = drcobject
+    
+children.print_node() 
     
 connection.close()
