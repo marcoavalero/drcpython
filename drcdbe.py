@@ -1,7 +1,7 @@
 from drcarg import *
 from drcobj import *
 
-from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite
 dbname = "metadata.db"
 connection = sqlite.connect(dbname)
 cursor = connection.cursor()
