@@ -18,11 +18,7 @@ lex.lex(module=drctokens)
 import drcobj
 from drcobj import DRC
 import drcarg
-<<<<<<< local
 from drcarg import *
-=======
-from drcarg import Arg
->>>>>>> other
 #vars = {}
 #args = {}
 # dictionary = []
@@ -38,13 +34,7 @@ def p_query(p):
     p[0] = p[2]
     p[0].set_type("Query")
     p[0].set_children(p[4])
-<<<<<<< local
     p[0].prune_tree()
-=======
-    p[0].reduce() 
-    p[0].demorgan()
-    p[0].doublenot()
->>>>>>> other
     p[0].print_node() 
 
 def p_varlist_name(p):
@@ -139,15 +129,10 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-<<<<<<< local
-    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
-    #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
+    #    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
     #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
-=======
-    argg = Arg(type="NAME", value=p[1])
->>>>>>> other
     p[0].set_arglist(argg)
-<<<<<<< local
     #    print "12"
 
 def p_arg_item_number(p):
@@ -160,21 +145,6 @@ def p_arg_item_string(p):
     'arg : STRING' 
     p[0]  = DRC("TempArgNode")
     argg = Str_Con(data=p[1])
-    p[0].set_arglist(argg)
-=======
-#    print "12"
->>>>>>> other
-
-def p_arg_item_number(p):
-    'arg : NUMBER'
-    p[0]  = DRC("TempArgNode")
-    argg = Arg(type="NUMBER", value=p[1])
-    p[0].set_arglist(argg)
-
-def p_arg_item_string(p):
-    'arg : STRING' 
-    p[0]  = DRC("TempArgNode")
-    argg = Arg(type="STRING", value=p[1])
     p[0].set_arglist(argg)
 
 def p_query_exit(p):
