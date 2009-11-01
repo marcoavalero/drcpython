@@ -8,11 +8,10 @@ class DRC(object):
         self.children = []
         self.argList = []
         self.varList = []
-        self.leftOperand = []
-        self.leftOperandType = []
+        self.leftOperand = ""
         self.operator = []
-        self.rightOperand = []
-        self.rightOperandType = []
+        self.rightOperand = ""
+        self.freeVariables = []
 
 #    def __del__(self):
         #print "%s DRCNode removed" % self.nodeType
@@ -39,16 +38,10 @@ class DRC(object):
         self.varList.append(varlist)
 
     def set_leftop(self, leftop):
-        self.leftOperand.append(leftop)
-
-    def set_leftop_type(self, leftop_type):
-        self.leftOperandType.append(leftop_type)
+        self.leftOperand = leftop
 
     def set_rightop(self, rightop):
-        self.rightOperand.append(rightop)
-
-    def set_rightop_type(self, rightop_type):
-        self.rightOperandType.append(rightop_type)
+        self.rightOperand = rightop
 
     def set_operator(self, operator):
         self.operator.append(operator)
@@ -67,7 +60,9 @@ class DRC(object):
             count = 0
             for item in self.children:
                 print self.children[count].nodeType
-                count = count + 1               
+                count = count + 1
+        if len(self.freeVariables) > 0:
+            print "Free Variables: ", self.freeVariables
         if self.nodeType == "Comparison":
             print "Left operand:", self.leftOperand
             print "Operator:", self.operator
@@ -95,6 +90,31 @@ class DRC(object):
             self.safety_check_or()
             self.type_check()
 
+    def set_free_variables(self):
+        self.freeVariables = self.get_free_variables()
+
+    def get_free_variables(self):
+        if self.nodeType == "Predicate":
+            return varList
+        elif self.nodeType == "Comparison":
+            return self.variable_check_comparison()
+        elif self.nodeType == "not":
+            for item in self.children:
+                item.set_free_variables()
+            return self.variable_check_not()
+        elif self.nodeType == "exists":
+            for item in self.children:
+                item.set_free_variables()
+            return self.variable_check_exists()
+        elif self.nodeType == "Query":
+            for item in self.children:
+                item.set_free_variables()
+            return self.get_free_from_subtree()    
+            
+
+    def safety_check(self):
+        return True
+            
 
 ## ========= REDUCTION ROUTINES ===================##
 
@@ -191,3 +211,40 @@ class DRC(object):
                 elif type(arg) == DRC:
                     allVariable.extend(arg.get_free_from_subtree())
         return allVariable
+
+    def variable_check_comparison(self):
+        k = self.leftOperand + self.rightOperand
+        if type(self.rightOperand[0]) != DRC_Var and type(self.leftOperand[0]) != DRC_Var:
+            print "Left and Right operands of comparison statement cannot both be constants"
+            raise ComparingConstantsError 
+        elif self.operator[0] != '=' or (type(self.rightOperand[0]) == DRC_Var and type(self.leftOperand[0]) == DRC_Var):
+            for i in k:
+                if type(i) == DRC_Var:
+                    i.limited = False
+        if type(self.rightOperand[0]) != type(self.leftOperand[0]):
+            v = filter(lambda a: type(a) == DRC_Var, k)
+            c = filter(lambda a: type(a) != DRC_Var, k)
+            if type(c[0]) == Str_Con:
+                v[0].type = "STRING"
+            else:
+                v[0].type = "NUMBER"
+        return [x for x in k if type(x)==DRC_Var]
+
+    def variable_check_not(self):
+        x = []
+        for item in self.children:
+            x.append(item.get_free_variables())
+        for i in x:
+            if type(i) == DRC_Var:
+                i.limited = False
+        return x
+
+    def variable_check_exists(self):
+        print self.varList
+        free = []
+        for item in self.children:
+            free.extend(item.get_free_variables())
+        for item in free:
+            if item in self.varList:
+                free.remove(item)
+        return free

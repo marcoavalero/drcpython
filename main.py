@@ -1,8 +1,10 @@
 import sys
 import drcdef
+import warnings
 import ply.yacc as yacc
 from drcdef import *
 from drcerr import *
+
 
 yacc.yacc(module=drcdef)
 
@@ -16,7 +18,8 @@ def main():
             break
         try:
             yacc.parse(s)
-        except UnmatchedVariableError:
+        except DrcError:
             continue
+
 
 main()
