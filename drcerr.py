@@ -9,3 +9,6 @@ class ComparingConstantsError(DrcError):
 
 class ConstantAssignedAsFreeError(DrcError):
     "Constant in free variables list"
+
+class TypeMatchingError(DrcError):
+    "Types do not match"

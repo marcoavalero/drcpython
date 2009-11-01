@@ -131,8 +131,8 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
-    #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
+    #argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
     #argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
     p[0].set_arglist(argg)
     #    print "12"

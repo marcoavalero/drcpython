@@ -95,7 +95,7 @@ class DRC(object):
 
     def get_free_variables(self):
         if self.nodeType == "Predicate":
-            return varList
+            return self.argList
         elif self.nodeType == "Comparison":
             return self.variable_check_comparison()
         elif self.nodeType == "not":
@@ -106,10 +106,15 @@ class DRC(object):
             for item in self.children:
                 item.set_free_variables()
             return self.variable_check_exists()
+        elif self.nodeType == "and" or self.nodeType == "or":
+            for item in self.children:
+                item.set_free_variables()
+            return self.variable_check_and_or()
         elif self.nodeType == "Query":
             for item in self.children:
                 item.set_free_variables()
             return self.get_free_from_subtree()    
+            
             
 
     def safety_check(self):
@@ -240,7 +245,6 @@ class DRC(object):
         return x
 
     def variable_check_exists(self):
-        print self.varList
         free = []
         for item in self.children:
             free.extend(item.get_free_variables())
@@ -248,3 +252,44 @@ class DRC(object):
             if item in self.varList:
                 free.remove(item)
         return free
+
+    def variable_check_and_or(self):
+        free = []
+        for item in self.children:
+            x = []
+            x.extend(item.get_free_variables())
+            for i in x:
+                if i.type == "UNKNOWN" and i in free:
+                    x.remove(i)
+            free = self.balance(free, x)
+        return free
+
+    def balance(self,f,x):
+        if len(x) == 0:
+            return f
+        else:
+            i = x.pop(0)
+            if i not in f:
+                f.append(i)
+            else:
+                j = f[f.index(i)]
+                f.remove(i)
+                if self.nodeType == "and":
+                    if j.limited == True or i.limited == True:
+                        j.limited, i.limited = True, True
+                    else:
+                        j.limited, i.limited = False, False
+                elif self.nodeType=="or":
+                    if j.limited == True and i.limited == True:
+                        j.limited, i.limited = True, True
+                    else:
+                        j.limited, i.limited = False, False
+                if verify(j,i):
+                    f.append(j)
+                else:
+                    if j.type == "UNKNOWN":
+                        f.append(i)
+                    else:
+                        print "Types do not Match: %s, %s" %(i,j)
+                        raise TypeMatchingError
+            return self.balance(f,x)
