@@ -35,18 +35,20 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
+    p[0].set_free_variables()
+    p[0].safety_check()
     p[0].print_node() 
 
 def p_varlist_name(p):
     'varlist : NAME'
     p[0]  = DRC("TempArgNode")
-    p[0].set_varlist(p[1])
+    p[0].set_varlist(DRC_Var(idid=p[1]))
 #    print "2"
 
 def p_varlist_expr(p):
     'varlist : varlist COMMA NAME'
     p[0] = p[1]
-    p[0].set_varlist(p[3])
+    p[0].set_varlist(DRC_Var(idid=p[3]))
 #    del p[1]
 #    print "3"
 
@@ -129,9 +131,9 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    #    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
-    argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
-    #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
+    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
+    #argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
     p[0].set_arglist(argg)
     #    print "12"
 
