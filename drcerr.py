@@ -12,3 +12,6 @@ class ConstantAssignedAsFreeError(DrcError):
 
 class TypeMatchingError(DrcError):
     "Types do not match"
+
+class SafetyError(DrcError):
+    "Unsafe Query"

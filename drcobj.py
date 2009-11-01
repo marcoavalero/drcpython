@@ -113,12 +113,23 @@ class DRC(object):
         elif self.nodeType == "Query":
             for item in self.children:
                 item.set_free_variables()
-            return self.get_free_from_subtree()    
+            return self.variable_check_query()
             
             
 
     def safety_check(self):
-        return True
+        for item in self.children:
+            if (item.nodeType == "not" or item.nodeType == "Comparison") and self.nodeType != "and":
+                print "%s-node requires and-node as parent" %(item.nodeType)
+                raise SafetyError
+        if self.nodeType == "Query":
+            self.safety_check_query()
+        elif self.nodeType == "or":
+            self.safety_check_or()
+        elif self.nodeType == "and":
+            self.safety_check_and()
+        for item in self.children:
+            item.safety_check()
             
 
 ## ========= REDUCTION ROUTINES ===================##
@@ -176,11 +187,20 @@ class DRC(object):
 
 ## =============== SAFETY CHECKS ============== ##
 
+    def safety_check_query(self):
+        for item in self.freeVariables:
+            if item not in self.varList:
+                print "Unmatched Free Variable in Query %s" %(item)
+                raise UnmatchedVariableError
+        for item in self.varList:
+            if item not in self.freeVariables:
+                print "Unmatched Argument in Query %s" %(item)
+                raise UnmatchedVariableError
+            
     def safety_check_or(self):
-        allVariable = self.get_free_from_subtree()
-        byVariable = set(allVariable)
+        byVariable = set(self.freeVariables)
         for item in self.children:
-            vars = filter((lambda a: type(a) == DRC_Var and a.free == True), item.argList)
+            vars = item.freeVariables
             if len(byVariable) == len(vars) and byVariable - set(vars) == set([]):
                 continue
             else:
@@ -189,14 +209,20 @@ class DRC(object):
                 print "Unmatched Variable in Predicate: %s" % (mySet)
                 raise UnmatchedVariableError
 
+    def safety_check_and(self):
+        for item in self.freeVariables:
+            if item.limited == False:
+                print "non-limited free variable in and-node"
+                raise SafetyError
+
 ## =============== TYPE CHECK ROUTINES ======== ##
 
     def type_check(self):
-        allVariable= self.get_free_from_subtree()
+        allVariable= self.get_free_from_children()
         eachVariable = []
         byVariable = set(allVariable)
-        print map(str, byVariable) #debug line
-        print map(str, allVariable) #debug line
+#        print map(str, byVariable) #debug line
+ #       print map(str, allVariable) #debug line
         truthTable = [(verify(x,y)) for x in byVariable for y in allVariable]
         truthTable = filter((lambda a: a == False), truthTable)
         if len(truthTable) > 0:
@@ -207,14 +233,10 @@ class DRC(object):
         
 ## ============ Usefull Subroutines ==============##
 
-    def get_free_from_subtree(self):
+    def get_free_from_children(self):
         allVariable = []
         for item in self.children:
-            for arg in item.argList:
-                if type(arg) == DRC_Var and arg.free == True:
-                    allVariable.append(arg)
-                elif type(arg) == DRC:
-                    allVariable.extend(arg.get_free_from_subtree())
+            allVariable.extend(item.freeVariables)
         return allVariable
 
     def variable_check_comparison(self):
@@ -293,3 +315,11 @@ class DRC(object):
                         print "Types do not Match: %s, %s" %(i,j)
                         raise TypeMatchingError
             return self.balance(f,x)
+
+    def variable_check_query(self):
+        free = []
+        for item in self.children:
+            x = []
+            x.extend(item.get_free_variables())
+            free.extend(x)
+        return free
