@@ -19,6 +19,9 @@ import drcobj
 from drcobj import DRC
 import drcarg
 from drcarg import *
+import drcdbe
+from drcdbe import *
+
 #vars = {}
 #args = {}
 # dictionary = []
@@ -35,7 +38,11 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
-    p[0].print_node() 
+#    p[0].print_node() 
+    dbtree = initializeDB()
+#    p[0].printdb(dbtree)
+    p[0].check_tables(dbtree)
+    p[0].print_node()  
 
 def p_varlist_name(p):
     'varlist : NAME'
@@ -49,6 +56,10 @@ def p_varlist_expr(p):
     p[0].set_varlist(p[3])
 #    del p[1]
 #    print "3"
+
+def p_formula_paren(p):
+    'formula : LPAREN formula RPAREN'
+    p[0] = p[2]
 
 def p_formula_base(p):
     'formula : atomicformula'
@@ -129,8 +140,8 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    #    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
-    argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
+    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
     #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
     p[0].set_arglist(argg)
     #    print "12"

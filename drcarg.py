@@ -30,10 +30,12 @@ class PrintCleaner(object):
 
 class Str_Con(PrintCleaner):
     data = "None"
+    type = "STRING"
 
 
 class Int_Con(PrintCleaner):
     data = ""
+    type = "INTEGER"
 
 class DRC_Var(PrintCleaner):
     idid = "$"
