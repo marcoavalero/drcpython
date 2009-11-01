@@ -1,5 +1,8 @@
 from drcarg import *
 from drcerr import *
+#from drcdbe import *
+
+
 class DRC(object):
     def __init__(self, nodeType):
         self.nodeType = nodeType
@@ -323,3 +326,41 @@ class DRC(object):
             x.extend(item.get_free_variables())
             free.extend(x)
         return free
+
+    def check_tablename(self,predicatenode):
+        if self.nodeType != "EMPTY":
+            if self.predicateName == predicatenode.predicateName:
+                print "Table %s found" % predicatenode.predicateName
+                tablelen = len(self.argList)
+                predicatelen = len(predicatenode.argList)
+                if  tablelen !=  predicatelen:
+                    print "Number of columns do NOT MATCH"
+                else:
+                    print "Number of columns MATCHED"
+                    count = 0
+                    for arguments in self.argList:
+                        if predicatenode.argList[count].type != "UKNOWN":
+                            print type_check(self.argList[count],predicatenode.argList[count])
+                        else:
+                            predicatenode.argList[count].type = self.argList[count].type
+                        count = count + 1
+            else:
+                self.children[0].check_tablename(predicatenode)
+        else:
+            print "Table %s NOT found" % predicatenode.predicateName
+            
+
+
+    def check_tables(self,dbtree):
+        if self.nodeType == "Predicate":
+            dbtree.check_tablename(self)
+        count = 0
+        for item in self.children:
+            self.children[count].check_tables(dbtree)     
+            count = count + 1
+
+    def printdb(self,dbtree):
+        print "******************DATABASE TREE*****************************"
+        dbtree.print_node() 
+
+
