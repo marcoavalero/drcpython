@@ -4,7 +4,7 @@ import warnings
 import ply.yacc as yacc
 from drcdef import *
 from drcerr import *
-
+from drcobj import *
 
 yacc.yacc(module=drcdef)
 
@@ -14,12 +14,10 @@ def main():
             s = raw_input('DRC> ')
         except EOFError:
             break
-        if s == "exit":
-            break
         try:
-            yacc.parse(s)
+            t = yacc.parse(s)
         except DrcError:
             continue
-
-
+        t.print_node()
+        
 main()

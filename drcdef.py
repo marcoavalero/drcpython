@@ -21,6 +21,7 @@ import drcarg
 from drcarg import *
 import drcdbe
 from drcdbe import *
+import drcsaf as safe
 
 #vars = {}
 #args = {}
@@ -38,12 +39,12 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
-    p[0].set_free_variables()
+    safe.set_free_variables(p[0])
     p[0].safety_check()
     dbtree = initializeDB()
 #    p[0].printdb(dbtree)
     p[0].check_tables(dbtree)
-    p[0].print_node()  
+
 
 def p_varlist_name(p):
     'varlist : NAME'
@@ -167,6 +168,7 @@ def p_query_exit(p):
     
 def p_error(p):
     print "Syntax error"
+    raise DrcError
 
 
     
