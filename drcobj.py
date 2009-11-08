@@ -49,6 +49,8 @@ class DRC(object):
     def set_operator(self, operator):
         self.operator.append(operator)
 
+    def set_free_variables(self, varlist):
+        self.freeVariables = varlist
         
     def print_node(self):
         print "------------DRCNode:", self.nodeType, "------------"
@@ -90,49 +92,13 @@ class DRC(object):
             self.reduce_and()     
         if self.nodeType == "or":
             self.reduce_or() 
-            self.safety_check_or()
-            self.type_check()
 
-    def set_free_variables(self):
-        self.freeVariables = self.get_free_variables()
 
-    def get_free_variables(self):
-        if self.nodeType == "Predicate":
-            return self.argList
-        elif self.nodeType == "Comparison":
-            return self.variable_check_comparison()
-        elif self.nodeType == "not":
-            for item in self.children:
-                item.set_free_variables()
-            return self.variable_check_not()
-        elif self.nodeType == "exists":
-            for item in self.children:
-                item.set_free_variables()
-            return self.variable_check_exists()
-        elif self.nodeType == "and" or self.nodeType == "or":
-            for item in self.children:
-                item.set_free_variables()
-            return self.variable_check_and_or()
-        elif self.nodeType == "Query":
-            for item in self.children:
-                item.set_free_variables()
-            return self.variable_check_query()
+
             
             
 
-    def safety_check(self):
-        for item in self.children:
-            if (item.nodeType == "not" or item.nodeType == "Comparison") and self.nodeType != "and":
-                print "%s-node requires and-node as parent" %(item.nodeType)
-                raise SafetyError
-        if self.nodeType == "Query":
-            self.safety_check_query()
-        elif self.nodeType == "or":
-            self.safety_check_or()
-        elif self.nodeType == "and":
-            self.safety_check_and()
-        for item in self.children:
-            item.safety_check()
+
             
 
 ## ========= REDUCTION ROUTINES ===================##
@@ -188,35 +154,6 @@ class DRC(object):
                     self.double_not_reduction()
             count = count + 1
 
-## =============== SAFETY CHECKS ============== ##
-
-    def safety_check_query(self):
-        for item in self.freeVariables:
-            if item not in self.varList:
-                print "Unmatched Free Variable in Query %s" %(item)
-                raise UnmatchedVariableError
-        for item in self.varList:
-            if item not in self.freeVariables:
-                print "Unmatched Argument in Query %s" %(item)
-                raise UnmatchedVariableError
-            
-    def safety_check_or(self):
-        byVariable = set(self.freeVariables)
-        for item in self.children:
-            vars = item.freeVariables
-            if len(byVariable) == len(vars) and byVariable - set(vars) == set([]):
-                continue
-            else:
-                mySet = byVariable - set(vars)
-                mySet = map((lambda a: a.idid), mySet)
-                print "Unmatched Variable in Predicate: %s" % (mySet)
-                raise UnmatchedVariableError
-
-    def safety_check_and(self):
-        for item in self.freeVariables:
-            if item.limited == False:
-                print "non-limited free variable in and-node"
-                raise SafetyError
 
 ## =============== TYPE CHECK ROUTINES ======== ##
 
@@ -242,90 +179,7 @@ class DRC(object):
             allVariable.extend(item.freeVariables)
         return allVariable
 
-    def variable_check_comparison(self):
-        k = self.leftOperand + self.rightOperand
-        if type(self.rightOperand[0]) != DRC_Var and type(self.leftOperand[0]) != DRC_Var:
-            print "Left and Right operands of comparison statement cannot both be constants"
-            raise ComparingConstantsError 
-        elif self.operator[0] != '=' or (type(self.rightOperand[0]) == DRC_Var and type(self.leftOperand[0]) == DRC_Var):
-            for i in k:
-                if type(i) == DRC_Var:
-                    i.limited = False
-        if type(self.rightOperand[0]) != type(self.leftOperand[0]):
-            v = filter(lambda a: type(a) == DRC_Var, k)
-            c = filter(lambda a: type(a) != DRC_Var, k)
-            if type(c[0]) == Str_Con:
-                v[0].type = "STRING"
-            else:
-                v[0].type = "NUMBER"
-        return [x for x in k if type(x)==DRC_Var]
 
-    def variable_check_not(self):
-        x = []
-        for item in self.children:
-            x.append(item.get_free_variables())
-        for i in x:
-            if type(i) == DRC_Var:
-                i.limited = False
-        return x
-
-    def variable_check_exists(self):
-        free = []
-        for item in self.children:
-            free.extend(item.get_free_variables())
-        for item in free:
-            if item in self.varList:
-                free.remove(item)
-        return free
-
-    def variable_check_and_or(self):
-        free = []
-        for item in self.children:
-            x = []
-            x.extend(item.get_free_variables())
-            for i in x:
-                if i.type == "UNKNOWN" and i in free:
-                    x.remove(i)
-            free = self.balance(free, x)
-        return free
-
-    def balance(self,f,x):
-        if len(x) == 0:
-            return f
-        else:
-            i = x.pop(0)
-            if i not in f:
-                f.append(i)
-            else:
-                j = f[f.index(i)]
-                f.remove(i)
-                if self.nodeType == "and":
-                    if j.limited == True or i.limited == True:
-                        j.limited, i.limited = True, True
-                    else:
-                        j.limited, i.limited = False, False
-                elif self.nodeType=="or":
-                    if j.limited == True and i.limited == True:
-                        j.limited, i.limited = True, True
-                    else:
-                        j.limited, i.limited = False, False
-                if verify(j,i):
-                    f.append(j)
-                else:
-                    if j.type == "UNKNOWN":
-                        f.append(i)
-                    else:
-                        print "Types do not Match: %s, %s" %(i,j)
-                        raise TypeMatchingError
-            return self.balance(f,x)
-
-    def variable_check_query(self):
-        free = []
-        for item in self.children:
-            x = []
-            x.extend(item.get_free_variables())
-            free.extend(x)
-        return free
 
     def check_tablename(self,predicatenode):
         if self.nodeType != "EMPTY":
