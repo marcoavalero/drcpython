@@ -39,11 +39,12 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
-    safe.set_free_variables(p[0])
-    p[0].safety_check()
-    dbtree = initializeDB()
+#    safe.set_free_variables(p[0])
+#    p[0].safety_check()
+#    dbtree = initializeDB()
 #    p[0].printdb(dbtree)
-    p[0].check_tables(dbtree)
+#    p[0].check_tables(dbtree)
+    p[0].numbernodes(1)
 
 
 def p_varlist_name(p):
@@ -165,6 +166,9 @@ def p_query_exit(p):
     print 'goodbye'
     exit()
 
+def p_query_database(p):
+    'query : DATABASE'
+    p[0]  = DRC("DBNode")
     
 def p_error(p):
     print "Syntax error"

@@ -15,6 +15,7 @@ reserved = {
     'exists' : 'EXISTS',
     'forall' : 'FORALL',
     'exit' : 'EXIT',
+    'database' : 'DATABASE',
     '<=' : 'LESSEQ',
     '>=' : 'GREAEQ',
     '<>' : 'DIFFERENT',
@@ -38,7 +39,7 @@ def t_NUMBER(t):
     return t
 
 def t_RESERVED(t):
-    r'and | or | exists | forall | not | exit | <= | >= | <> | < | > | ='
+    r'and | or | exists | forall | not | exit | database | <= | >= | <> | < | > | ='
     t.type = reserved.get(t.value, 'BOMB')
     return t
 

@@ -16,6 +16,7 @@ class DRC(object):
         self.operator = []
         self.rightOperand = ""
         self.freeVariables = []
+        self.nodenumber = 0
 
 #    def __del__(self):
         #print "%s DRCNode removed" % self.nodeType
@@ -55,6 +56,7 @@ class DRC(object):
         
     def print_node(self):
         print "------------DRCNode:", self.nodeType, "------------"
+        print "Node Number:", self.nodenumber
         if self.nodeType == "Predicate":
             print "Predicate name:", self.predicateName
         if len(self.varList) > 0:
@@ -227,24 +229,31 @@ class DRC(object):
     def check_tablename(self,predicatenode):
         if self.nodeType != "EMPTY":
             if self.predicateName == predicatenode.predicateName:
-                print "Table %s found" % predicatenode.predicateName
+                #print "Table %s found" % predicatenode.predicateName
                 tablelen = len(self.argList)
                 predicatelen = len(predicatenode.argList)
                 if  tablelen !=  predicatelen:
-                    print "Number of columns do NOT MATCH"
+                    print "Error on table %s " % predicatenode.predicateName
+                #    print "Number of columns do NOT MATCH"
+                    raise ColumnsError
                 else:
-                    print "Number of columns MATCHED"
+                    #print "Number of columns MATCHED"
                     count = 0
                     for arguments in self.argList:
                         if predicatenode.argList[count].type != "UKNOWN":
-                            print type_check(self.argList[count],predicatenode.argList[count])
+                            if not type_check(self.argList[count],predicatenode.argList[count]):
+                                print "Error on table %s " % predicatenode.predicateName
+                                raise TypeMatchingError
+
                         else:
                             predicatenode.argList[count].type = self.argList[count].type
                         count = count + 1
             else:
                 self.children[0].check_tablename(predicatenode)
         else:
-            print "Table %s NOT found" % predicatenode.predicateName
+            print "Table %s not found" % predicatenode.predicateName
+            raise TableNameError
+
             
 
 
@@ -260,3 +269,10 @@ class DRC(object):
         print "******************DATABASE TREE*****************************"
         dbtree.print_node() 
 
+    def numbernodes(self,number):
+        self.nodenumber = number
+        count = 0
+        for item in self.children:
+            number = self.children[count].numbernodes(number + 1)
+            count = count + 1
+        return number

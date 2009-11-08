@@ -9,6 +9,7 @@ from drcobj import *
 yacc.yacc(module=drcdef)
 
 def main():
+    dbtree = initializeDB()
     while True:
         try:
             s = raw_input('DRC> ')
@@ -16,8 +17,15 @@ def main():
             break
         try:
             t = yacc.parse(s)
+ 
+            if (t.nodeType == 'DBNode'):
+                dbtree.print_node()
+            else:
+                t.check_tables(dbtree)
+                t.print_node()
+
         except DrcError:
             continue
-        t.print_node()
+
         
 main()
