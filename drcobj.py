@@ -1,6 +1,5 @@
 from drcarg import *
 from drcerr import *
-from drcsaf import *
 #from drcdbe import *
 
 
@@ -51,7 +50,7 @@ class DRC(object):
         self.operator.append(operator)
 
     def set_free_variables(self, varlist):
-        self.freeVariables.extend(varlist)
+        self.freeVariables = varlist
         
     def print_node(self):
         print "------------DRCNode:", self.nodeType, "------------"
@@ -93,26 +92,13 @@ class DRC(object):
             self.reduce_and()     
         if self.nodeType == "or":
             self.reduce_or() 
-            self.safety_check_or()
-            self.type_check()
+
 
 
             
             
 
-    def safety_check(self):
-        for item in self.children:
-            if (item.nodeType == "not" or item.nodeType == "Comparison") and self.nodeType != "and":
-                print "%s-node requires and-node as parent" %(item.nodeType)
-                raise SafetyError
-        if self.nodeType == "Query":
-            self.safety_check_query()
-        elif self.nodeType == "or":
-            self.safety_check_or()
-        elif self.nodeType == "and":
-            self.safety_check_and()
-        for item in self.children:
-            item.safety_check()
+
             
 
 ## ========= REDUCTION ROUTINES ===================##
@@ -168,35 +154,6 @@ class DRC(object):
                     self.double_not_reduction()
             count = count + 1
 
-## =============== SAFETY CHECKS ============== ##
-
-    def safety_check_query(self):
-        for item in self.freeVariables:
-            if item not in self.varList:
-                print "Unmatched Free Variable in Query %s" %(item)
-                raise UnmatchedVariableError
-        for item in self.varList:
-            if item not in self.freeVariables:
-                print "Unmatched Argument in Query %s" %(item)
-                raise UnmatchedVariableError
-            
-    def safety_check_or(self):
-        byVariable = set(self.freeVariables)
-        for item in self.children:
-            vars = item.freeVariables
-            if len(byVariable) == len(vars) and byVariable - set(vars) == set([]):
-                continue
-            else:
-                mySet = byVariable - set(vars)
-                mySet = map((lambda a: a.idid), mySet)
-                print "Unmatched Variable in Predicate: %s" % (mySet)
-                raise UnmatchedVariableError
-
-    def safety_check_and(self):
-        for item in self.freeVariables:
-            if item.limited == False:
-                print "non-limited free variable in and-node"
-                raise SafetyError
 
 ## =============== TYPE CHECK ROUTINES ======== ##
 

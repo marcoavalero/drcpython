@@ -21,7 +21,6 @@ import drcarg
 from drcarg import *
 import drcdbe
 from drcdbe import *
-import drcsaf as safe
 
 #vars = {}
 #args = {}
@@ -39,8 +38,6 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
-    safe.set_free_variables(p[0])
-    p[0].safety_check()
     dbtree = initializeDB()
 #    p[0].printdb(dbtree)
     p[0].check_tables(dbtree)
@@ -142,9 +139,9 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    #argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
     #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
-    #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
+    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
     p[0].set_arglist(argg)
     #    print "12"
 
