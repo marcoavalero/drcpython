@@ -31,8 +31,8 @@ def main():
     	        limit.set_limits(t)
                 safe.safety_check(t)
                 t.check_tables(dbtree)
-                t.print_node()
                 query.gen_query(t,dbtree)
+                t.print_node()
         except DrcError:
             continue
         

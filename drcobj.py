@@ -16,6 +16,7 @@ class DRC(object):
         self.rightOperand = ""
         self.freeVariables = []
         self.nodenumber = 0
+        self.query = ""
 
 #    def __del__(self):
         #print "%s DRCNode removed" % self.nodeType
@@ -74,6 +75,8 @@ class DRC(object):
             print "Left operand:", self.leftOperand
             print "Operator:", self.operator
             print "Right operand:", self.rightOperand
+        if self.query != "":
+            print "Query: ", self.query
 
         print "-------------------------------\n"
         count = 0

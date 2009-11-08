@@ -5,7 +5,7 @@ from sqlite3 import dbapi2 as sqlite
 
 def initializeDB():
 
-    dbname = "company.db"
+    dbname = "metadata.db"
     connection = sqlite.connect(dbname)
     cursor = connection.cursor()
     cursor1 = connection.cursor()
@@ -43,9 +43,9 @@ def initializeDB():
     return children
 
 def gen_query(drctree,dbtree):
-    print "Generating query"
+    print "GENERATING QUERY:"
     gen_predicate_query(drctree,dbtree)
-#    gen_and_query(drctree,dbtree)
+    gen_internal_query(drctree,dbtree)
 
 def gen_predicate_query(drctree,dbtree):
     SQUE = ""
@@ -74,7 +74,7 @@ def gen_predicate_query(drctree,dbtree):
                    if variable in S1:
                        SWHERE = SWHERE + " and " + table.argList[drctree.argList.index(variable)].data + " = " + str(variable.data)
 
-# To compare duplicate variables
+           # To compare duplicate variables
            S=set(drctree.argList)
            while len(S) > 0:
                R = []	
@@ -93,6 +93,7 @@ def gen_predicate_query(drctree,dbtree):
            SFROM = drctree.predicateName
            string_query = " ".join(["select distinct", SQUE, "from", SFROM, "where 1=1", SWHERE, S1WHERE])  
            print string_query
+           drctree.query = string_query
     else:
         count = 0
         for item in drctree.children:
@@ -107,3 +108,47 @@ def find_table(name, dbtree):
            return find_table(name, dbtree.children[0]) 
     else:
         print "Error finding table"
+
+
+def gen_internal_query(drctree,dbtree):
+    for item in drctree.children:
+        if item.query == "":
+            gen_internal_query(item,dbtree)     
+            
+        if drctree.nodeType == "exists":
+            gen_exists_query(drctree)
+        if drctree.nodeType == "or":
+            gen_or_query(drctree)
+        if drctree.nodeType == "and":
+            print "and function"
+
+def gen_exists_query(drctree):
+    FREEVAR = ""
+    SFROM = ""
+    flag = 0
+    for variable in drctree.freeVariables:
+        if flag == 0:
+            FREEVAR = FREEVAR + "TEMP"+  str(drctree.children[0].nodenumber) + "."+ variable.idid
+            flag = 1
+        else:
+            FREEVAR = FREEVAR + ", TEMP"+ str(drctree.children[0].nodenumber) + "."+ variable.idid
+    SFROM = SFROM + "(" + drctree.children[0].query + ")"
+    SFROM = SFROM + " TEMP" + str(drctree.children[0].nodenumber)
+
+    if variable in drctree.freeVariables :
+        string_query = " ".join(["select distinct", FREEVAR, "from", SFROM, "where 1=1"])  
+    #print string_query
+    drctree.query = string_query
+
+def gen_or_query(drctree):
+    QUERY = ""
+    flag = 0
+    for child in drctree.children:
+        if flag == 0:
+            QUERY = QUERY + child.query
+            flag = 1
+        else:
+            QUERY = QUERY + " UNION " + child.query
+    string_query =  QUERY 
+    #print string_query
+    drctree.query = string_query
