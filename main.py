@@ -8,6 +8,7 @@ from drcobj import *
 import drcfre as free
 import drcsaf as safe
 import drclim as limit
+import drcdbe as query
 
 yacc.yacc(module=drcdef)
 
@@ -20,7 +21,7 @@ def main():
             break
         try:
             t = yacc.parse(s)
-         except DrcError:
+        except DrcError:
             continue
         try:
             if (t.nodeType == 'DBNode'):
@@ -31,6 +32,7 @@ def main():
                 safe.safety_check(t)
                 t.check_tables(dbtree)
                 t.print_node()
+                query.gen_query(t,dbtree)
         except DrcError:
             continue
         

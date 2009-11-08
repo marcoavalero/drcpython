@@ -1,3 +1,5 @@
+import random as r
+
 class metaPrintCleaner(type):
     """
     I'm borrowing this method from page 120 of 'Python in a Nutshell', second edition
@@ -31,11 +33,13 @@ class PrintCleaner(object):
 class Str_Con(PrintCleaner):
     data = "None"
     type = "STRING"
+    idid = r.random()
 
 
 class Int_Con(PrintCleaner):
     data = ""
     type = "INTEGER"
+    idid = r.random()
 
 class DRC_Var(PrintCleaner):
     idid = "$"
