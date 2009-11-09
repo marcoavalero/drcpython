@@ -5,7 +5,7 @@ from sqlite3 import dbapi2 as sqlite
 
 def initializeDB():
 
-    dbname = "metadata.db"
+    dbname = "dbs/movie.sql"
     connection = sqlite.connect(dbname)
     cursor = connection.cursor()
     cursor1 = connection.cursor()
