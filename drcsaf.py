@@ -13,10 +13,16 @@ def safety_check(t):
         safety_check_or(t)
     elif t.nodeType == "and":
         safety_check_and(t)
+    elif t.nodeType == 'exists':
+        safety_check_exists(t)
     for item in t.children:
         safety_check(item)
 
 def safety_check_query(t):
+    s = set(t.argList)
+    if len(s) != len (t.argList):
+        print "repeated variable in exists node"
+        raise SafetyError
     for item in t.freeVariables:
         if item not in t.varList:
             print "Unmatched Free Variable in Query %s" %(item)
@@ -45,3 +51,8 @@ def safety_check_and(t):
             raise SafetyError
 
 
+def safety_check_exists(t):
+    s = set(t.varList)
+    if len(s) != len (t.varList):
+        print "repeated variable in exists node"
+        raise SafetyError
