@@ -18,7 +18,7 @@ def main():
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
-	dbname = "metadata.db"
+    dbname = "metadata.db"
     dbtree = initializeDB(dbname)
     for opt, arg in opts:
         if opt in ("-h, help"):
@@ -32,6 +32,7 @@ def main():
         except EOFError:
             break
         try:
+            t = yacc.parse(s)
         except DrcError:
             continue
         try:
@@ -44,10 +45,10 @@ def main():
                     free.set_free_variables(t)
                     limit.set_limits(t)
                     safe.safety_check(t)
-					if not debug:
-	                    t.check_tables(dbtree)
+                    if not debug:
+                        t.check_tables(dbtree)
     	                query.gen_query(t,dbtree)
-					t.print_node()
+                    t.print_node()
         except DrcError:
             continue
         
