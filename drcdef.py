@@ -21,7 +21,6 @@ import drcarg
 from drcarg import *
 import drcdbe
 from drcdbe import *
-import drcsaf as safe
 
 #vars = {}
 #args = {}
@@ -39,11 +38,7 @@ def p_query(p):
     p[0].set_type("Query")
     p[0].set_children(p[4])
     p[0].prune_tree()
-    safe.set_free_variables(p[0])
-    p[0].safety_check()
-    dbtree = initializeDB()
-#    p[0].printdb(dbtree)
-    p[0].check_tables(dbtree)
+    p[0].numbernodes(1)
 
 
 def p_varlist_name(p):
@@ -142,9 +137,9 @@ def p_arglist_group(p):
 def p_arg_item_name(p):
     'arg : NAME' 
     p[0]  = DRC("TempArgNode")
-    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
+    #argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
     #argg = DRC_Var(idid=p[1], type = random.choice(["STRING", "NUMBER"])) #DEBUG LINE
-    #    argg = DRC_Var(idid=p[1], type = random.choice(["STRING"])) #DEBUG LINE
+    argg = DRC_Var(idid=p[1]) #NOT THE DEBUG LINE
     p[0].set_arglist(argg)
     #    print "12"
 
@@ -165,6 +160,17 @@ def p_query_exit(p):
     print 'goodbye'
     exit()
 
+def p_query_database(p):
+    'query : DATABASE'
+    p[0]  = DRC("DBNode")
+
+def p_query_usedb(p):
+    'query : USE STRING'
+    p[0]  = DRC("USEDB")
+    filename = p[2]
+    filename = filename.strip('\'')
+    p[0].predicateName = filename
+    print "Database changed to ", filename
     
 def p_error(p):
     print "Syntax error"

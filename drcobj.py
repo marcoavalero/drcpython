@@ -1,6 +1,5 @@
 from drcarg import *
 from drcerr import *
-from drcsaf import *
 #from drcdbe import *
 
 
@@ -16,6 +15,8 @@ class DRC(object):
         self.operator = []
         self.rightOperand = ""
         self.freeVariables = []
+        self.nodenumber = 0
+        self.query = ""
 
 #    def __del__(self):
         #print "%s DRCNode removed" % self.nodeType
@@ -51,10 +52,11 @@ class DRC(object):
         self.operator.append(operator)
 
     def set_free_variables(self, varlist):
-        self.freeVariables.extend(varlist)
+        self.freeVariables = varlist
         
     def print_node(self):
         print "------------DRCNode:", self.nodeType, "------------"
+        print "Node Number:", self.nodenumber
         if self.nodeType == "Predicate":
             print "Predicate name:", self.predicateName
         if len(self.varList) > 0:
@@ -73,6 +75,8 @@ class DRC(object):
             print "Left operand:", self.leftOperand
             print "Operator:", self.operator
             print "Right operand:", self.rightOperand
+        if self.query != "":
+            print "Query: ", self.query
 
         print "-------------------------------\n"
         count = 0
@@ -93,26 +97,13 @@ class DRC(object):
             self.reduce_and()     
         if self.nodeType == "or":
             self.reduce_or() 
-            self.safety_check_or()
-            self.type_check()
+
 
 
             
             
 
-    def safety_check(self):
-        for item in self.children:
-            if (item.nodeType == "not" or item.nodeType == "Comparison") and self.nodeType != "and":
-                print "%s-node requires and-node as parent" %(item.nodeType)
-                raise SafetyError
-        if self.nodeType == "Query":
-            self.safety_check_query()
-        elif self.nodeType == "or":
-            self.safety_check_or()
-        elif self.nodeType == "and":
-            self.safety_check_and()
-        for item in self.children:
-            item.safety_check()
+
             
 
 ## ========= REDUCTION ROUTINES ===================##
@@ -168,35 +159,6 @@ class DRC(object):
                     self.double_not_reduction()
             count = count + 1
 
-## =============== SAFETY CHECKS ============== ##
-
-    def safety_check_query(self):
-        for item in self.freeVariables:
-            if item not in self.varList:
-                print "Unmatched Free Variable in Query %s" %(item)
-                raise UnmatchedVariableError
-        for item in self.varList:
-            if item not in self.freeVariables:
-                print "Unmatched Argument in Query %s" %(item)
-                raise UnmatchedVariableError
-            
-    def safety_check_or(self):
-        byVariable = set(self.freeVariables)
-        for item in self.children:
-            vars = item.freeVariables
-            if len(byVariable) == len(vars) and byVariable - set(vars) == set([]):
-                continue
-            else:
-                mySet = byVariable - set(vars)
-                mySet = map((lambda a: a.idid), mySet)
-                print "Unmatched Variable in Predicate: %s" % (mySet)
-                raise UnmatchedVariableError
-
-    def safety_check_and(self):
-        for item in self.freeVariables:
-            if item.limited == False:
-                print "non-limited free variable in and-node"
-                raise SafetyError
 
 ## =============== TYPE CHECK ROUTINES ======== ##
 
@@ -222,30 +184,42 @@ class DRC(object):
             allVariable.extend(item.freeVariables)
         return allVariable
 
+    def numbernodes(self,number):
+        self.nodenumber = number
+        count = 0
+        for item in self.children:
+            number = self.children[count].numbernodes(number + 1)
+            count = count + 1
+        return number
 
 
     def check_tablename(self,predicatenode):
         if self.nodeType != "EMPTY":
             if self.predicateName == predicatenode.predicateName:
-                print "Table %s found" % predicatenode.predicateName
+                #print "Table %s found" % predicatenode.predicateName
                 tablelen = len(self.argList)
                 predicatelen = len(predicatenode.argList)
                 if  tablelen !=  predicatelen:
-                    print "Number of columns do NOT MATCH"
+                    print "Error on table %s " % predicatenode.predicateName
+                #    print "Number of columns do NOT MATCH"
+                    raise ColumnsError
                 else:
-                    print "Number of columns MATCHED"
+                    #print "Number of columns MATCHED"
                     count = 0
                     for arguments in self.argList:
                         if predicatenode.argList[count].type != "UKNOWN":
-                            print type_check(self.argList[count],predicatenode.argList[count])
+                            if not type_check(self.argList[count],predicatenode.argList[count]):
+                                print "Error on table %s " % predicatenode.predicateName
+                                raise TypeMatchingError
+
                         else:
                             predicatenode.argList[count].type = self.argList[count].type
                         count = count + 1
             else:
                 self.children[0].check_tablename(predicatenode)
         else:
-            print "Table %s NOT found" % predicatenode.predicateName
-            
+            print "Table %s not found" % predicatenode.predicateName
+            raise TableNameError
 
 
     def check_tables(self,dbtree):
@@ -255,9 +229,3 @@ class DRC(object):
         for item in self.children:
             self.children[count].check_tables(dbtree)     
             count = count + 1
-
-    def printdb(self,dbtree):
-        print "******************DATABASE TREE*****************************"
-        dbtree.print_node() 
-
-
