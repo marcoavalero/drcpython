@@ -163,6 +163,14 @@ def p_query_exit(p):
 def p_query_database(p):
     'query : DATABASE'
     p[0]  = DRC("DBNode")
+
+def p_query_usedb(p):
+    'query : USE STRING'
+    p[0]  = DRC("USEDB")
+    filename = p[2]
+    filename = filename.strip('\'')
+    p[0].predicateName = filename
+    print "Database changed to ", filename
     
 def p_error(p):
     print "Syntax error"

@@ -3,9 +3,9 @@ from drcobj import *
 
 from sqlite3 import dbapi2 as sqlite
 
-def initializeDB():
+def initializeDB(dbname):
 
-    dbname = "metadata.db"
+#    dbname = "metadata.db"
     connection = sqlite.connect(dbname)
     cursor = connection.cursor()
     cursor1 = connection.cursor()
@@ -121,6 +121,7 @@ def gen_internal_query(drctree,dbtree):
             gen_or_query(drctree)
         if drctree.nodeType == "and":
             print "and function"
+            
 
 def gen_exists_query(drctree):
     FREEVAR = ""

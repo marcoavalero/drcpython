@@ -13,7 +13,8 @@ import drcdbe as query
 yacc.yacc(module=drcdef)
 
 def main():
-    dbtree = initializeDB()
+    dbname = "metadata.db"
+    dbtree = initializeDB(dbname)
     while True:
         try:
             s = raw_input('DRC> ')
@@ -27,12 +28,15 @@ def main():
             if (t.nodeType == 'DBNode'):
                 dbtree.print_node()
             else:
-                free.set_free_variables(t)
-    	        limit.set_limits(t)
-                safe.safety_check(t)
-                t.check_tables(dbtree)
-                query.gen_query(t,dbtree)
-                t.print_node()
+                if (t.nodeType == 'USEDB'):
+                    dbtree = initializeDB(t.predicateName)
+                else:
+                    free.set_free_variables(t)
+                    limit.set_limits(t)
+                    safe.safety_check(t)
+                    t.check_tables(dbtree)
+                    query.gen_query(t,dbtree)
+                    t.print_node()
         except DrcError:
             continue
         
