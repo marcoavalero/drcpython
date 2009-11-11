@@ -34,6 +34,11 @@ def main():
         try:
             t = yacc.parse(s)
         except DrcError:
+            try:
+                t.print_node()
+            except:
+                pass
+            print "Syntax Error"
             continue
         try:
             if (t.nodeType == 'DBNode'):
@@ -50,6 +55,9 @@ def main():
     	                query.gen_query(t,dbtree)
                     t.print_node()
         except DrcError:
+            if debug:
+                t.print_node()
+                print "Check Error Message"
             continue
         
 main()

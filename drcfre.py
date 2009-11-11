@@ -1,6 +1,7 @@
 from drcarg import *
 from drcerr import *
 from drcobj import *
+from copy import *
 
 
 def set_free_variables(t):
@@ -8,7 +9,7 @@ def set_free_variables(t):
 
 def get_free_variables(t):
     if t.nodeType == "Predicate":
-        return filter(lambda a: type(a) == DRC_Var, t.argList)
+        return [copy(a) for a in t.argList if type(a) == DRC_Var]
     elif t.nodeType == "Comparison":
         return variable_check_comparison(t)
     elif t.nodeType == "not":
@@ -44,20 +45,20 @@ def variable_check_comparison(t):
             v[0].type = "STRING"
         else:
             v[0].type = "NUMBER"
-    return [x for x in k if type(x)==DRC_Var]
+    return [copy(x) for x in k if type(x)==DRC_Var]
 
 def variable_check_not(t):
     free = []
     for item in t.children:
         free.extend(get_free_variables(item))
-    return free
+    return list(free)
 
 def variable_check_exists(t):
     free = []
     for item in t.children:
         free.extend(get_free_variables(item))
-    for item in free:
-        if item in t.varList:
+    for item in t.varList:
+        while item in free:
             free.remove(item)
     return free
 
