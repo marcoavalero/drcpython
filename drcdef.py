@@ -173,7 +173,7 @@ def p_query_usedb(p):
     print "Database changed to ", filename
     
 def p_error(p):
-    print "Syntax error"
+    print "Syntax error" + str(p)
     raise DrcError
 
 
