@@ -55,34 +55,35 @@ class DRC(object):
         self.freeVariables = varlist
         
     def print_node(self):
-        print "------------DRCNode:", self.nodeType, "------------"
-        print "Node Number:", self.nodenumber
-        if self.nodeType == "Predicate":
-            print "Predicate name:", self.predicateName
-        if len(self.varList) > 0:
-            print "Variables list:", self.varList 
-        if len(self.argList) > 0:
-            print "Arguments list:", (map(str,self.argList))
-        if len(self.children) > 0:
-            print "Children:"
+        if self.nodeType != "EMPTY":
+            print "------------DRCNode:", self.nodeType, "------------"
+            print "Node Number:", self.nodenumber
+            if self.nodeType == "Predicate":
+                print "Predicate name:", self.predicateName
+            if len(self.varList) > 0:
+                print "Variables list:", self.varList 
+            if len(self.argList) > 0:
+                print "Arguments list:", (map(str,self.argList))
+            if len(self.children) > 0:
+                print "Children:"
+                count = 0
+                for item in self.children:
+                    print self.children[count].nodeType
+                    count = count + 1
+                if len(self.freeVariables) > 0:
+                    print "Free Variables: ", self.freeVariables
+                if self.nodeType == "Comparison":
+                    print "Left operand:", self.leftOperand
+                    print "Operator:", self.operator
+                    print "Right operand:", self.rightOperand
+                if self.query != "":
+                    print "Query: ", self.query
+
+            print "-------------------------------\n"
             count = 0
             for item in self.children:
-                print self.children[count].nodeType
-                count = count + 1
-        if len(self.freeVariables) > 0:
-            print "Free Variables: ", self.freeVariables
-        if self.nodeType == "Comparison":
-            print "Left operand:", self.leftOperand
-            print "Operator:", self.operator
-            print "Right operand:", self.rightOperand
-        if self.query != "":
-            print "Query: ", self.query
-
-        print "-------------------------------\n"
-        count = 0
-        for item in self.children:
-            self.children[count].print_node()
-            count = count + 1        
+                self.children[count].print_node()
+                count = count + 1        
 
 ## ========= CONTROL ROUTINES ==================== ##
             

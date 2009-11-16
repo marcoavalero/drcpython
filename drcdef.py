@@ -171,6 +171,24 @@ def p_query_usedb(p):
     filename = filename.strip('\'')
     p[0].predicateName = filename
     print "Database changed to ", filename
+
+def p_query_help(p):
+    'query : HELP'
+    p[0]  = DRC("HELP")
+    p[0].predicateName = p[1]
+    print "DRC Parser version 1.0 (by Marco Valero & John Daigle)\n\nCommand\t\t\tDescription\n-------\t\t\t----------\nuse 'database_name'\tChanges the database\ndatabase\t\tShows the database tables\ndebug\t\t\tEnables debug mode\nnodebug\t\t\tDisables debug mode\n"
+
+def p_query_debug(p):
+    'query : DEBUG'
+    p[0]  = DRC("DEBUG")
+    p[0].predicateName = p[1]
+    print "Debug mode enabled\n"
+
+def p_query_nodebug(p):
+    'query : NODEBUG'
+    p[0]  = DRC("NODEBUG")
+    p[0].predicateName = p[1]
+    print "Debug mode disabled\n"
     
 def p_error(p):
     raise DrcError("Syntax error" + str(p))
