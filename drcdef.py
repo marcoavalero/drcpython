@@ -157,7 +157,7 @@ def p_arg_item_string(p):
 
 def p_query_exit(p):
     'query : EXIT'
-    print 'goodbye'
+    print 'Goodbye\n'
     exit()
 
 def p_query_database(p):

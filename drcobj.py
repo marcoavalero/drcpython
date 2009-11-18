@@ -49,7 +49,7 @@ class DRC(object):
         self.rightOperand = rightop
 
     def set_operator(self, operator):
-        self.operator.append(operator)
+        self.operator = operator 
 
     def set_free_variables(self, varlist):
         self.freeVariables = varlist
@@ -72,12 +72,12 @@ class DRC(object):
                     count = count + 1
                 if len(self.freeVariables) > 0:
                     print "Free Variables: ", self.freeVariables
-                if self.nodeType == "Comparison":
-                    print "Left operand:", self.leftOperand
-                    print "Operator:", self.operator
-                    print "Right operand:", self.rightOperand
-                if self.query != "":
-                    print "Query: ", self.query
+            if self.nodeType == "Comparison":
+                print "Left operand:", self.leftOperand
+                print "Operator:", self.operator
+                print "Right operand:", self.rightOperand
+            if self.query != "":
+                print "Query: ", self.query
 
             print "-------------------------------\n"
             count = 0
@@ -209,11 +209,10 @@ class DRC(object):
                     for arguments in self.argList:
                         if predicatenode.argList[count].type != "UKNOWN":
                             if not type_check(self.argList[count],predicatenode.argList[count]):
-                                print 
                                 raise TypeMatchingError("Error on table %s " % predicatenode.predicateName)
-
                         else:
                             predicatenode.argList[count].type = self.argList[count].type
+                            #print "ASSIGNED TYPE" , self.argList[count].type
                         count = count + 1
             else:
                 self.children[0].check_tablename(predicatenode)
