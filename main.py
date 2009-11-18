@@ -8,6 +8,7 @@ from drcobj import *
 import drcfre as free
 import drcsaf as safe
 import drclim as limit
+import drctyp as tych
 import drcdbe as query
 
 yacc.yacc(module=drcdef)
@@ -66,6 +67,7 @@ def main():
                         free.set_free_variables(t)
                         limit.set_limits(t)
                         safe.safety_check(t)
+                        tych.type_check(t)
                         query.gen_query(t,dbtree)
                     t.print_node()
         except DrcError, e:
