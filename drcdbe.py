@@ -219,7 +219,7 @@ def gen_and_query(drctree):
     count = 0
     for child in drctree.children:
         if (drctree.children[count].nodeType == "not"):
-            WHERE = " and (" + drctree.children[count].query + ")"
+            WHERE = " and (" + "variables" + ") "+ drctree.children[count].query
         count = count + 1
 ###### WHERE: FOR NOT###################
 

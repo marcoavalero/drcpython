@@ -19,7 +19,7 @@ def main():
         sys.exit(2)
     debug = False
 #    dbname = "metadata.db"
-    dbname = "dbs/modb.sql"
+    dbname = "dbs/movie.sql"
     dbtree = initializeDB(dbname)
 
     for opt, arg in opts:
