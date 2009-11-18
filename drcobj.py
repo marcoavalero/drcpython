@@ -163,19 +163,26 @@ class DRC(object):
 
 ## =============== TYPE CHECK ROUTINES ======== ##
 
-    def type_check(self):
-        allVariable= self.get_free_from_children()
-        eachVariable = []
-        byVariable = set(allVariable)
+#    def type_check(self):
+#        allVariable= self.get_free_from_children()
+#        eachVariable = []
+#        byVariable = set(allVariable)
 #        print map(str, byVariable) #debug line
- #       print map(str, allVariable) #debug line
-        truthTable = [(verify(x,y)) for x in byVariable for y in allVariable]
-        truthTable = filter((lambda a: a == False), truthTable)
-        if len(truthTable) > 0:
-            return False
-        else:
-            return True
-               
+#       print map(str, allVariable) #debug line
+#        truthTable = [(verify(x,y)) for x in byVariable for y in allVariable]
+#        truthTable = filter((lambda a: a == False), truthTable)
+#        if len(truthTable) > 0:
+#            return False
+#        else:
+#            return True
+ 
+    def type_check(self):
+        if self.nodeType == 'and':
+            self.type_check_and()
+
+    def type_check_and(self):
+        for item in self.children:
+            pass
         
 ## ============ Usefull Subroutines ==============##
 

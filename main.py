@@ -8,6 +8,7 @@ from drcobj import *
 import drcfre as free
 import drcsaf as safe
 import drclim as limit
+import drctyp as tych
 import drcdbe as query
 
 yacc.yacc(module=drcdef)
@@ -18,8 +19,7 @@ def main():
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
-#    dbname = "metadata.db"
-    dbname = "dbs/movie.sql"
+    dbname = "metadata.db"
     dbtree = initializeDB(dbname)
 
     for opt, arg in opts:
@@ -61,7 +61,7 @@ def main():
                         free.set_free_variables(t)
                         limit.set_limits(t)
                         safe.safety_check(t)
-                    else:
+                    elif not debug:
                         t.assign_type_to_nodes(dbtree,1)
                         t.assign_type_to_nodes(dbtree,2)
                         free.set_free_variables(t)

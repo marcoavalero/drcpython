@@ -25,6 +25,9 @@ def get_free_variables(t):
             set_free_variables(item)
         return variable_check_and_or(t)
     elif t.nodeType == "Query":
+        args = set(t.varList)
+        if len(args) != len(t.varList):
+            raise OverloadedArgumentsError("Repeated Arguments in Query")
         for item in t.children:
             set_free_variables(item)
         return variable_check_query(t)    
@@ -44,14 +47,6 @@ def variable_check_comparison(t):
             v[0].type = "STRING"
         else:
             v[0].type = "INTEGER"
-#            v[0].type = "NUMBER"
-#DAMN IT. Spent 2 hours to find this error
-#    else:
-#        t.rightOperand[0].type = "STRING"
-#        t.leftOperand[0].type = "STRING"
-#        t.rightOperand[0].type = "INTEGER"
-#        t.leftOperand[0].type = "INTEGER"
-
     return [copy(x) for x in k if type(x)==DRC_Var]
 
 def variable_check_not(t):
