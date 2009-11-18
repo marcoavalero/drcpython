@@ -43,7 +43,7 @@ def initializeDB(dbname):
     return children
 
 def gen_query(drctree,dbtree):
-    print "GENERATING QUERY:"
+    #print "GENERATING QUERIES:"
     gen_predicate_query(drctree,dbtree)
     gen_comparison_query(drctree)
     gen_internal_query(drctree,dbtree)
@@ -93,7 +93,7 @@ def gen_predicate_query(drctree,dbtree):
 
            SFROM = drctree.predicateName
            string_query = " ".join(["select distinct", SQUE, "from", SFROM, "where 1=1", SWHERE, S1WHERE])  
-           print string_query
+           #print string_query
            drctree.query = string_query
     else:
         count = 0
@@ -172,7 +172,7 @@ def gen_comparison_query(drctree):
         QUERY = " " + drctree.operator + " " + str(drctree.rightOperand[0].data)
         string_query =  QUERY 
         #print string_query
-        print "HERE!!!!"
+        print "COMPARISON QUERY"
         drctree.query = string_query
     else:
         count = 0

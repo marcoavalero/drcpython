@@ -220,10 +220,39 @@ class DRC(object):
             raise TableNameError( "Table %s not found" % predicatenode.predicateName)
 
 
-    def check_tables(self,dbtree):
-        if self.nodeType == "Predicate":
-            dbtree.check_tablename(self)
-        count = 0
-        for item in self.children:
-            self.children[count].check_tables(dbtree)     
-            count = count + 1
+    def assign_type_to_nodes(self,dbtree,action):
+        if action == 1 :
+            #print "Assigning types to predicate nodes"
+            if self.nodeType == "Predicate":
+                dbtree.check_tablename(self)
+            count = 0
+            for item in self.children:
+                self.children[count].assign_type_to_nodes(dbtree,action)     
+                count = count + 1
+        if action == 2:
+            if self.nodeType == "and":
+                #print "Assigning types to comparison nodes: "
+                count = 0
+                for item in self.children:
+                    if self.children[count].nodeType == "Comparison":
+                        #print "Before"
+                        #print self.children[count].rightOperand
+                        #print self.children[count].leftOperand
+                        self.assign_comparison_type(self.children[count])
+                        #print "After"
+                        #print self.children[count].rightOperand
+                        #print self.children[count].leftOperand
+                    count = count + 1
+            count = 0
+            for item in self.children:
+                self.children[count].assign_type_to_nodes(dbtree,action)     
+                count = count + 1
+
+    def assign_comparison_type(self,comparison_node):
+        for predicatenode in self.children:
+            if predicatenode.nodeType == "Predicate":
+                for argument in predicatenode.argList:
+                    if comparison_node.rightOperand[0] == argument:
+                        comparison_node.rightOperand[0].type = argument.type
+                    if comparison_node.leftOperand[0] == argument:
+                        comparison_node.leftOperand[0].type = argument.type
