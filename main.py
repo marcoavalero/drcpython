@@ -57,11 +57,11 @@ def main():
                         debug = False
                     t.nodeType = 'null'
                 else:
-                    t.check_tables(dbtree)
                     free.set_free_variables(t)
                     limit.set_limits(t)
                     safe.safety_check(t)
                     if not debug:
+                        t.check_tables(dbtree)
     	                query.gen_query(t,dbtree)
                     t.print_node()
         except DrcError, e:

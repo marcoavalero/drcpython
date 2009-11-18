@@ -46,11 +46,11 @@ def variable_check_comparison(t):
             v[0].type = "INTEGER"
 #            v[0].type = "NUMBER"
 #DAMN IT. Spent 2 hours to find this error
-    else:
+#    else:
 #        t.rightOperand[0].type = "STRING"
 #        t.leftOperand[0].type = "STRING"
-        t.rightOperand[0].type = "INTEGER"
-        t.leftOperand[0].type = "INTEGER"
+#        t.rightOperand[0].type = "INTEGER"
+#        t.leftOperand[0].type = "INTEGER"
 
     return [copy(x) for x in k if type(x)==DRC_Var]
 
