@@ -32,7 +32,7 @@ def initializeDB(dbname):
         cursor2.execute("pragma table_info("+tablename+")")
         for columninfo in cursor2:
             #        print columninfo[2]
-            if(columninfo[2] == "INTEGER"):
+            if(columninfo[2] == "INTEGER" or columninfo[2] == "NUMBER" or columninfo[2] == "integer"):
                 argg = Int_Con(data=columninfo[1])
             else:
                 argg = Str_Con(data=columninfo[1])
@@ -43,8 +43,9 @@ def initializeDB(dbname):
     return children
 
 def gen_query(drctree,dbtree):
-    print "GENERATING QUERY:"
+    #print "GENERATING QUERIES:"
     gen_predicate_query(drctree,dbtree)
+    gen_comparison_query(drctree)
     gen_internal_query(drctree,dbtree)
 
 def gen_predicate_query(drctree,dbtree):
@@ -92,7 +93,7 @@ def gen_predicate_query(drctree,dbtree):
 
            SFROM = drctree.predicateName
            string_query = " ".join(["select distinct", SQUE, "from", SFROM, "where 1=1", SWHERE, S1WHERE])  
-           print string_query
+           #print string_query
            drctree.query = string_query
     else:
         count = 0
@@ -119,8 +120,10 @@ def gen_internal_query(drctree,dbtree):
             gen_exists_query(drctree)
         if drctree.nodeType == "or":
             gen_or_query(drctree)
+        if drctree.nodeType == "not":
+            gen_not_query(drctree)
         if drctree.nodeType == "and":
-            print "and function"
+            gen_and_query(drctree)
             
 
 def gen_exists_query(drctree):
@@ -153,3 +156,87 @@ def gen_or_query(drctree):
     string_query =  QUERY 
     #print string_query
     drctree.query = string_query
+
+def gen_not_query(drctree):
+    QUERY = ""
+    flag = 0
+    QUERY = "not in (" + drctree.children[0].query + ") "
+    string_query =  QUERY 
+    #print string_query
+    drctree.query = string_query
+
+def gen_comparison_query(drctree):
+    if drctree.nodeType == "Comparison":
+        QUERY = ""
+        flag = 0
+        QUERY = " " + drctree.operator + " " + str(drctree.rightOperand[0].data)
+        string_query =  QUERY 
+        #print string_query
+        print "COMPARISON QUERY"
+        drctree.query = string_query
+    else:
+        count = 0
+        for item in drctree.children:
+            gen_comparison_query(drctree.children[count])     
+            count = count + 1
+
+def gen_and_query(drctree):
+    FREEVAR = ""
+    SFROM = ""
+    WHERE = ""
+
+###### FREE VARIABLES #################
+    flag = 0
+    for variable in drctree.freeVariables:
+        if flag == 0:
+            FREEVAR = FREEVAR + "TEMP" +  set_queryvar_for_and_node(drctree,variable) + "."+ variable.idid
+            flag = 1
+        else:
+            FREEVAR = FREEVAR + ", TEMP"+ set_queryvar_for_and_node(drctree,variable) + "."+ variable.idid
+###### FREE VARIABLES #################
+
+
+###### FROM: REPEAT FOR EACH CHILD #################
+    count = 0
+    flag = 0
+    for child in drctree.children:
+        if (drctree.children[count].nodeType == "Predicate" or drctree.children[count].nodeType == "exists" or drctree.children[count].nodeType == "or"):
+            if flag == 0:
+                SFROM = SFROM + "(" + drctree.children[count].query + ")"
+                SFROM = SFROM + " TEMP" + str(drctree.children[count].nodenumber)
+                flag = 1
+            else:
+                SFROM = SFROM + ", (" + drctree.children[count].query + ")"
+                SFROM = SFROM + " TEMP" + str(drctree.children[count].nodenumber)
+        count = count + 1
+###### FROM: REPEAT FOR EACH CHILD #################
+
+###### WHERE: FOR COMPARISON###################
+###### WHERE: FOR COMPARISON###################
+
+
+###### WHERE: FOR NOT###################
+    count = 0
+    for child in drctree.children:
+        if (drctree.children[count].nodeType == "not"):
+            WHERE = " and (" + drctree.children[count].query + ")"
+        count = count + 1
+###### WHERE: FOR NOT###################
+
+###### WHERE: JOIN CONDITIONS###################
+###### WHERE: JOIN CONDITIONS###################
+
+    string_query = " ".join(["select distinct", FREEVAR, "from", SFROM, "where 1=1",WHERE])  
+    #print string_query
+    drctree.query = string_query
+
+
+def set_queryvar_for_and_node(drctree,variable):
+    count = 0
+    for child in drctree.children:
+        if (drctree.children[count].nodeType == "Predicate" or drctree.children[count].nodeType == "exists" or drctree.children[count].nodeType == "or"):
+            if variable in drctree.children[count].argList:
+                    return str(drctree.children[count].nodenumber)
+        count = count + 1
+
+    return "-err"

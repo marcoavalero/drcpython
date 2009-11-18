@@ -49,40 +49,41 @@ class DRC(object):
         self.rightOperand = rightop
 
     def set_operator(self, operator):
-        self.operator.append(operator)
+        self.operator = operator 
 
     def set_free_variables(self, varlist):
         self.freeVariables = varlist
         
     def print_node(self):
-        print "------------DRCNode:", self.nodeType, "------------"
-        print "Node Number:", self.nodenumber
-        if self.nodeType == "Predicate":
-            print "Predicate name:", self.predicateName
-        if len(self.varList) > 0:
-            print "Variables list:", self.varList 
-        if len(self.argList) > 0:
-            print "Arguments list:", (map(str,self.argList))
-        if len(self.children) > 0:
-            print "Children:"
+        if self.nodeType != "EMPTY":
+            print "------------DRCNode:", self.nodeType, "------------"
+            print "Node Number:", self.nodenumber
+            if self.nodeType == "Predicate":
+                print "Predicate name:", self.predicateName
+            if len(self.varList) > 0:
+                print "Variables list:", self.varList 
+            if len(self.argList) > 0:
+                print "Arguments list:", (map(str,self.argList))
+            if len(self.children) > 0:
+                print "Children:"
+                count = 0
+                for item in self.children:
+                    print self.children[count].nodeType
+                    count = count + 1
+                if len(self.freeVariables) > 0:
+                    print "Free Variables: ", self.freeVariables
+            if self.nodeType == "Comparison":
+                print "Left operand:", self.leftOperand
+                print "Operator:", self.operator
+                print "Right operand:", self.rightOperand
+            if self.query != "":
+                print "Query: ", self.query
+
+            print "-------------------------------\n"
             count = 0
             for item in self.children:
-                print self.children[count].nodeType
-                count = count + 1
-        if len(self.freeVariables) > 0:
-            print "Free Variables: ", self.freeVariables
-        if self.nodeType == "Comparison":
-            print "Left operand:", self.leftOperand
-            print "Operator:", self.operator
-            print "Right operand:", self.rightOperand
-        if self.query != "":
-            print "Query: ", self.query
-
-        print "-------------------------------\n"
-        count = 0
-        for item in self.children:
-            self.children[count].print_node()
-            count = count + 1        
+                self.children[count].print_node()
+                count = count + 1        
 
 ## ========= CONTROL ROUTINES ==================== ##
             
@@ -215,11 +216,10 @@ class DRC(object):
                     for arguments in self.argList:
                         if predicatenode.argList[count].type != "UKNOWN":
                             if not type_check(self.argList[count],predicatenode.argList[count]):
-                                print 
                                 raise TypeMatchingError("Error on table %s " % predicatenode.predicateName)
-
                         else:
                             predicatenode.argList[count].type = self.argList[count].type
+                            #print "ASSIGNED TYPE" , self.argList[count].type
                         count = count + 1
             else:
                 self.children[0].check_tablename(predicatenode)
@@ -227,10 +227,39 @@ class DRC(object):
             raise TableNameError( "Table %s not found" % predicatenode.predicateName)
 
 
-    def check_tables(self,dbtree):
-        if self.nodeType == "Predicate":
-            dbtree.check_tablename(self)
-        count = 0
-        for item in self.children:
-            self.children[count].check_tables(dbtree)     
-            count = count + 1
+    def assign_type_to_nodes(self,dbtree,action):
+        if action == 1 :
+            #print "Assigning types to predicate nodes"
+            if self.nodeType == "Predicate":
+                dbtree.check_tablename(self)
+            count = 0
+            for item in self.children:
+                self.children[count].assign_type_to_nodes(dbtree,action)     
+                count = count + 1
+        if action == 2:
+            if self.nodeType == "and":
+                #print "Assigning types to comparison nodes: "
+                count = 0
+                for item in self.children:
+                    if self.children[count].nodeType == "Comparison":
+                        #print "Before"
+                        #print self.children[count].rightOperand
+                        #print self.children[count].leftOperand
+                        self.assign_comparison_type(self.children[count])
+                        #print "After"
+                        #print self.children[count].rightOperand
+                        #print self.children[count].leftOperand
+                    count = count + 1
+            count = 0
+            for item in self.children:
+                self.children[count].assign_type_to_nodes(dbtree,action)     
+                count = count + 1
+
+    def assign_comparison_type(self,comparison_node):
+        for predicatenode in self.children:
+            if predicatenode.nodeType == "Predicate":
+                for argument in predicatenode.argList:
+                    if comparison_node.rightOperand[0] == argument:
+                        comparison_node.rightOperand[0].type = argument.type
+                    if comparison_node.leftOperand[0] == argument:
+                        comparison_node.leftOperand[0].type = argument.type
