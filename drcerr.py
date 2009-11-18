@@ -25,3 +25,5 @@ class ColumnsError(DrcError):
 
 class TableNameError(DrcError):
     "Table not found"
+class OverloadedArgumentsError(DrcError):
+    "repeated argument in Query"
