@@ -62,11 +62,11 @@ def main():
                         safe.safety_check(t)
                     elif not debug:
                         t.assign_type_to_nodes(dbtree,1)
-						t.assign_type_to_nodes(dbtree,2)
+                        t.assign_type_to_nodes(dbtree,2)
                         free.set_free_variables(t)
                         limit.set_limits(t)
                         safe.safety_check(t)
-						query.gen_query(t,dbtree)
+                        query.gen_query(t,dbtree)
                     t.print_node()
         except DrcError, e:
             if debug:
