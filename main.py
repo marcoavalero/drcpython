@@ -19,7 +19,7 @@ def main():
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
-    dbname = "metadata.db"
+    dbname = "dbs/modb.sql"
     dbtree = initializeDB(dbname)
 
     for opt, arg in opts:
@@ -61,6 +61,7 @@ def main():
                         free.set_free_variables(t)
                         limit.set_limits(t)
                         safe.safety_check(t)
+                        t.print_node()
                     elif not debug:
                         t.assign_type_to_nodes(dbtree,1)
                         t.assign_type_to_nodes(dbtree,2)
@@ -68,7 +69,11 @@ def main():
                         limit.set_limits(t)
                         safe.safety_check(t)
     	                query.gen_query(t,dbtree)
-                    t.print_node()
+                        t.query = t.children[0].query
+                        print "\nSQL QUERY:\n"
+                        print t.query
+                        print "\nRESULTS:\n"
+                        query.execute_query(t,dbname)
         except DrcError, e:
             if debug:
                 t.print_node()

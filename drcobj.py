@@ -76,8 +76,8 @@ class DRC(object):
                 print "Left operand:", self.leftOperand
                 print "Operator:", self.operator
                 print "Right operand:", self.rightOperand
-            if self.query != "":
-                print "Query: ", self.query
+            #if self.query != "":
+            #    print "Query: ", self.query
 
             print "-------------------------------\n"
             count = 0
