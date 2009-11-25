@@ -19,7 +19,7 @@ def main():
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
-    dbname = "dbs/modb.sql"
+    dbname = "modb"
     dbtree = initializeDB(dbname)
 
     for opt, arg in opts:

@@ -1,12 +1,11 @@
 from drcarg import *
 from drcobj import *
-
-from sqlite3 import dbapi2 as sqlite
+import MySQLdb as sql
 
 def initializeDB(dbname):
 
 #    dbname = "metadata.db"
-    connection = sqlite.connect(dbname)
+    connection = sql.connect(db = dbname)
     cursor = connection.cursor()
     cursor1 = connection.cursor()
     cursor2 = connection.cursor()
@@ -14,13 +13,13 @@ def initializeDB(dbname):
     columnshash = {}
     argumenthash = {}
 
-    cursor.execute( "select tbl_name from sqlite_master where type = 'table'" )
+    cursor.execute( 'show tables' )
     listoftables = cursor.fetchall()
     for tablename in listoftables :
         tablenames.append(tablename[0].lower())
 
     for tablename in tablenames :
-        cursor1.execute("pragma table_info("+tablename+")")
+        cursor1.execute("show columns from %s" %(tablename))
         columns = cursor1.fetchall()
         columnshash[tablename] = len(columns)
 
@@ -29,13 +28,13 @@ def initializeDB(dbname):
         drcobject  = DRC("Predicate")
         drcobject.set_predicate(tablename)
         drcobject.set_children(children)
-        cursor2.execute("pragma table_info("+tablename+")")
+        cursor2.execute("show columns from %s" %(tablename))
         for columninfo in cursor2:
             #        print columninfo[2]
-            if(columninfo[2] == "INTEGER" or columninfo[2] == "NUMBER" or columninfo[2] == "integer"):
-                argg = Int_Con(data=columninfo[1])
+            if('int' in columninfo[1] or 'tinyint' in columninfo[1] or 'smallint' in columninfo[1] or 'mediumint' in columninfo[1] or 'bigint' in columninfo[1]):
+                argg = Int_Con(data=columninfo[0])
             else:
-                argg = Str_Con(data=columninfo[1])
+                argg = Str_Con(data=columninfo[0])
             drcobject.set_arglist(argg)
         children = drcobject
     
@@ -43,7 +42,7 @@ def initializeDB(dbname):
     return children
 
 def execute_query(drctree,dbname):
-    connection = sqlite.connect(dbname)
+    connection = sql.connect(dbname)
     cursor = connection.cursor()
 #    cursor.executemany("select TEMP3.y from (select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000) as TEMP3")
     cursor.execute("select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000")
