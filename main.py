@@ -15,19 +15,23 @@ yacc.yacc(module=drcdef)
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h:d", ["help", "debug"])
+        opts, args = getopt.getopt(sys.argv[1:], "hd:b", ["help", "database=", "debug"])
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
     dbname = "modb"
     dbtree = initializeDB(dbname)
 
-    for opt, arg in opts:
-        if opt in ("-h, help"):
-            usage()
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            print "DRC Parser version 1.0 (by Marco Valero & John Daigle)\n\nCommand\t\t\tDescription\n-------\t\t\t----------\n-h, --help\t\tprint this message and exit\n-d db_name,\t\tchoose a starting database\n--database=db_name\t\t\n'-b'\t\t\tEnables debug mode\n'-p=password'\t\trequire password\n'-u=username'\t\tset username\n"
             sys.exit()
-        elif opt in ('-d'):
+        elif o in ('-b'):
             debug = True
+        elif o in ('-d', '--database='):
+            print "I am a D with an %s" %(a)
+            dbname=str(a)
+            dbtree=initializeDB(dbname)
     while True:
         try:
             s = raw_input('DRC> ')
@@ -50,7 +54,8 @@ def main():
             else:
                 if (t.nodeType == 'USEDB' or t.nodeType == 'HELP' or t.nodeType == 'DEBUG' or t.nodeType == 'NODEBUG'):
                     if (t.nodeType == 'USEDB'):
-                        dbtree = initializeDB(t.predicateName)
+                        dbname = t.predicateName
+                        dbtree = initializeDB(dbname)
                     if (t.nodeType == 'DEBUG'):
                         debug = True
                     if (t.nodeType == 'NODEBUG'):
@@ -81,5 +86,10 @@ def main():
             print "%s: %s" %(type(e), str(e)) 
             print "*********************************************************************************************\n"
             continue
-        
+
+
+       
+
 main()
+
+

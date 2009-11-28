@@ -5,7 +5,7 @@ import MySQLdb as sql
 def initializeDB(dbname):
 
 #    dbname = "metadata.db"
-    connection = sql.connect(db = dbname)
+    connection = sql.connect(db = dbname, host = 'localhost')
     cursor = connection.cursor()
     cursor1 = connection.cursor()
     cursor2 = connection.cursor()
@@ -42,12 +42,12 @@ def initializeDB(dbname):
     return children
 
 def execute_query(drctree,dbname):
-    connection = sql.connect(dbname)
+    connection = sql.connect(db=dbname)
     cursor = connection.cursor()
 #    cursor.executemany("select TEMP3.y from (select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000) as TEMP3")
-    cursor.execute("select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000")
+#    cursor.execute("select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000")
 
-#    cursor.execute(drctree.query) #NO DEBUG LINE
+    cursor.execute(drctree.query) #NO DEBUG LINE
     results = cursor.fetchall()
     for tablename in results :
         r = ""
@@ -236,7 +236,7 @@ def gen_and_query(drctree):
             if type(child.rightOperand[0]) == Str_Con or type(child.rightOperand[0]) == Int_Con:
                 if type(child.leftOperand[0]) == DRC_Var:
                     WHERE = WHERE + " and TEMP" + set_queryvar_for_node(drctree,child.leftOperand[0]) + "." + child.leftOperand[0].idid +" "+ child.operator[0] +" " + str(child.rightOperand[0].data)
-
+                    
             if type(child.leftOperand[0]) == Str_Con or type(child.leftOperand[0]) == Int_Con:
                 if type(child.rightOperand[0]) == DRC_Var:
                     WHERE = WHERE + " and " + str(child.leftOperand[0].data) +" "+ child.operator[0] +" " + "TEMP" + set_queryvar_for_node(drctree,child.rightOperand[0]) + "." + child.leftOperand[0].idid
@@ -248,17 +248,20 @@ def gen_and_query(drctree):
 
 ###### WHERE: FOR NOT###################
     count = 0
+    flag = 0
     for child in drctree.children:
         if (drctree.children[count].nodeType == "not"):
             WHERE = WHERE + " and ("
-
-            flag = 0
             for variable in drctree.children[count].freeVariables:
                 if flag == 0:
-                    WHERE2 = WHERE2 + "TEMP" +  set_queryvar_for_node(drctree,variable) + "."+ variable.idid
+                    TEMPASS = "TEMP" +  set_queryvar_for_node(drctree,variable) + "."+ variable.idid
+                    if WHERE2.count(TEMPASS) == 0:
+                        WHERE2 = WHERE2 + TEMPASS
                     flag = 1
                 else:
-                    WHERE2 = WHERE2 + ", TEMP"+ set_queryvar_for_node(drctree,variable) + "."+ variable.idid
+                    TEMPASS = "TEMP" +  set_queryvar_for_node(drctree,variable) + "."+ variable.idid
+                    if WHERE2.count(TEMPASS) == 0:
+                        WHERE2 = WHERE2 + ", "+ TEMPASS
 
             WHERE = WHERE + WHERE2 + ") "+ drctree.children[count].query
 
