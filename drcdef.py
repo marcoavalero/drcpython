@@ -143,10 +143,16 @@ def p_arg_item_name(p):
     p[0].set_arglist(argg)
     #    print "12"
 
-def p_arg_item_number(p):
-    'arg : NUMBER'
+def p_arg_item_integer(p):
+    'arg : INTEGER'
     p[0]  = DRC("TempArgNode")
     argg = Int_Con(data=p[1])
+    p[0].set_arglist(argg)
+
+def p_arg_item_decimal(p):
+    'arg : DECIMAL'
+    p[0]  = DRC("TempArgNode")
+    argg = Dec_Con(data=p[1])
     p[0].set_arglist(argg)
 
 def p_arg_item_string(p):

@@ -2,10 +2,11 @@ from drcarg import *
 from drcobj import *
 import MySQLdb as sql
 
-def initializeDB(dbname):
+def initializeDB(dbname, host_serv, username, password):
 
 #    dbname = "metadata.db"
-    connection = sql.connect(db = dbname, host = 'localhost')
+    
+    connection = sql.connect(db = dbname, user = username, passwd = password, host = host_serv )
     cursor = connection.cursor()
     cursor1 = connection.cursor()
     cursor2 = connection.cursor()
@@ -33,6 +34,8 @@ def initializeDB(dbname):
             #        print columninfo[2]
             if('int' in columninfo[1] or 'tinyint' in columninfo[1] or 'smallint' in columninfo[1] or 'mediumint' in columninfo[1] or 'bigint' in columninfo[1]):
                 argg = Int_Con(data=columninfo[0])
+            elif ('decimal' in columninfo[1]):
+                argg = Dec_Con(data=columninfo[0])
             else:
                 argg = Str_Con(data=columninfo[0])
             drcobject.set_arglist(argg)

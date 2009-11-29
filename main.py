@@ -15,23 +15,28 @@ yacc.yacc(module=drcdef)
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:b", ["help", "database=", "debug"])
+        opts, args = getopt.getopt(sys.argv[1:], "hd:u:p:b", ["help", "database=", "debug"])
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
     dbname = "modb"
-    dbtree = initializeDB(dbname)
+    username = ''
+    password = ''
+    host_serv = 'localhost'
 
     for o, a in opts:
         if o in ('-h', '--help'):
-            print "DRC Parser version 1.0 (by Marco Valero & John Daigle)\n\nCommand\t\t\tDescription\n-------\t\t\t----------\n-h, --help\t\tprint this message and exit\n-d db_name,\t\tchoose a starting database\n--database=db_name\t\t\n'-b'\t\t\tEnables debug mode\n'-p=password'\t\trequire password\n'-u=username'\t\tset username\n"
+            print "DRC Parser version 1.0 (by Marco Valero & John Daigle)\n\nCommand\t\t\tDescription\n-------\t\t\t----------\n-h, --help\t\tprint this message and exit\n-d db_name,\t\tchoose a starting database\n--database=db_name\t\t\n'-b'\t\t\tEnables debug mode\n'-p=password'\t\trequire password\n'-u username'\t\tset username\n"
             sys.exit()
-        elif o in ('-b'):
+        if o in ('-b'):
             debug = True
-        elif o in ('-d', '--database='):
-            print "I am a D with an %s" %(a)
+        if o in ('-d', '--database='):
             dbname=str(a)
-            dbtree=initializeDB(dbname)
+        if o in ('-u'):
+            username = str(a)
+        if o in ('-p'):
+            password = str(a)
+    dbtree = initializeDB(dbname, host_serv, username, password)
     while True:
         try:
             s = raw_input('DRC> ')
@@ -55,7 +60,7 @@ def main():
                 if (t.nodeType == 'USEDB' or t.nodeType == 'HELP' or t.nodeType == 'DEBUG' or t.nodeType == 'NODEBUG'):
                     if (t.nodeType == 'USEDB'):
                         dbname = t.predicateName
-                        dbtree = initializeDB(dbname)
+                        dbtree = initializeDB(dbname, host_serv, username, password)
                     if (t.nodeType == 'DEBUG'):
                         debug = True
                     if (t.nodeType == 'NODEBUG'):
