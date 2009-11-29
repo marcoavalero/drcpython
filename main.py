@@ -83,7 +83,8 @@ def main():
                         print "\nSQL QUERY:\n"
                         print t.query
                         print "\nRESULTS:\n"
-                        query.execute_query(t,dbname)
+                        query.execute_query(t,dbname, host_serv, username, password)
+                        t.nodeType = 'null'
         except DrcError, e:
             if debug:
                 t.print_node()

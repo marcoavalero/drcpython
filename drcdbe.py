@@ -44,11 +44,9 @@ def initializeDB(dbname, host_serv, username, password):
     connection.close()
     return children
 
-def execute_query(drctree,dbname):
-    connection = sql.connect(db=dbname)
+def execute_query(drctree,dbname, host_serv, username, password):
+    connection = sql.connect(db = dbname, user = username, passwd = password, host = host_serv )
     cursor = connection.cursor()
-#    cursor.executemany("select TEMP3.y from (select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000) as TEMP3")
-#    cursor.execute("select distinct TEMP4.y, TEMP4.x from (select distinct ZIP x,CITY y from zipcodes where 1=1  ) TEMP4 where 1=1  and TEMP4.x < 60000")
 
     cursor.execute(drctree.query) #NO DEBUG LINE
     results = cursor.fetchall()
