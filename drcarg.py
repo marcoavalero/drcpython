@@ -41,6 +41,11 @@ class Int_Con(PrintCleaner):
     type = "INTEGER"
     idid = r.random()
 
+class Dec_Con(PrintCleaner):
+    data = ""
+    type = "DECIMAL"
+    idid = r.random()
+
 class DRC_Var(PrintCleaner):
     idid = "$"
     type = "UKNOWN"

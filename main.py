@@ -15,19 +15,28 @@ yacc.yacc(module=drcdef)
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h:d", ["help", "debug"])
+        opts, args = getopt.getopt(sys.argv[1:], "hd:u:p:b", ["help", "database=", "debug"])
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
-    dbname = "compilers"
-    dbtree = initializeDB(dbname)
+    dbname = "modb"
+    username = ''
+    password = ''
+    host_serv = 'localhost'
 
-    for opt, arg in opts:
-        if opt in ("-h, help"):
-            usage()
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            print "DRC Parser version 1.0 (by Marco Valero & John Daigle)\n\nCommand\t\t\tDescription\n-------\t\t\t----------\n-h, --help\t\tprint this message and exit\n-d db_name,\t\tchoose a starting database\n--database=db_name\t\t\n'-b'\t\t\tEnables debug mode\n'-p=password'\t\trequire password\n'-u username'\t\tset username\n"
             sys.exit()
-        elif opt in ('-d'):
+        if o in ('-b'):
             debug = True
+        if o in ('-d', '--database='):
+            dbname=str(a)
+        if o in ('-u'):
+            username = str(a)
+        if o in ('-p'):
+            password = str(a)
+    dbtree = initializeDB(dbname, host_serv, username, password)
     while True:
         try:
             s = raw_input('DRC> ')
@@ -50,7 +59,8 @@ def main():
             else:
                 if (t.nodeType == 'USEDB' or t.nodeType == 'HELP' or t.nodeType == 'DEBUG' or t.nodeType == 'NODEBUG'):
                     if (t.nodeType == 'USEDB'):
-                        dbtree = initializeDB(t.predicateName)
+                        dbname = t.predicateName
+                        dbtree = initializeDB(dbname, host_serv, username, password)
                     if (t.nodeType == 'DEBUG'):
                         debug = True
                     if (t.nodeType == 'NODEBUG'):
@@ -73,7 +83,8 @@ def main():
                         #print "\nSQL QUERY:\n"
                         #print t.query
                         print "\nRESULTS:\n"
-                        query.execute_query(t,dbname)
+                        query.execute_query(t,dbname, host_serv, username, password)
+                        t.nodeType = 'null'
         except DrcError, e:
             if debug:
                 t.print_node()
@@ -81,5 +92,10 @@ def main():
             print "%s: %s" %(type(e), str(e)) 
             print "*********************************************************************************************\n"
             continue
-        
+
+
+       
+
 main()
+
+
