@@ -1,6 +1,7 @@
 import sys, getopt
 import drcdef
 import warnings
+import readline
 import ply.yacc as yacc
 from drcdef import *
 from drcerr import *
@@ -39,7 +40,16 @@ def main():
     dbtree = initializeDB(dbname, host_serv, username, password)
     while True:
         try:
-            s = raw_input('DRC> ')
+            s = ''
+            a = True
+            while a == True:
+                s = s + raw_input('DRC> ')
+                if s.startswith('{'):
+                    while not ('}') in s:
+                        s = s + raw_input('DRC> ')
+                    a = False
+                else:
+                    a = False
         except EOFError:
             break
         try:
