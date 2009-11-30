@@ -1,5 +1,6 @@
 from drcarg import *
 from drcerr import *
+from copy import *
 #from drcdbe import *
 
 
@@ -92,6 +93,7 @@ class DRC(object):
         self.reduce_tree(1)
         self.reduce_tree(2)
         self.reduce_tree(3)
+        self.reduce_tree(4)
 
     def check_node_reduction(self):
         if self.nodeType == "and":
@@ -116,6 +118,8 @@ class DRC(object):
             self.demorgan_reduction()            
         if action == 3:
             self.double_not_reduction() 
+        if action == 4:
+            self.compare_not_reduction()
         count = 0
         for item in self.children:
             self.children[count].reduce_tree(action)     
@@ -160,6 +164,29 @@ class DRC(object):
                     self.double_not_reduction()
             count = count + 1
 
+    def compare_not_reduction(self):
+        for item in self.children:
+            if self.nodeType == "not" and item.nodeType == "Comparison":
+                o = []
+                l = copy(item.leftOperand)
+                r = copy(item.rightOperand)
+                if item.operator == '<>':
+                    o = '='
+                elif item.operator == '=':
+                    o = '<>'
+                elif item.operator == '>':
+                    o = '<='
+                elif item.operator == '<':
+                    o = '>='
+                elif item.operator == '>=':
+                    o = '<'
+                elif item.operator == '<=':
+                    o = '>'
+                self.set_leftop(l)
+                self.set_rightop(r)
+                self.set_operator(o)
+                self.set_type("Comparison")
+                self.del_children(item)
 
 ## =============== TYPE CHECK ROUTINES ======== ##
 

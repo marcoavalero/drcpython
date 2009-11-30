@@ -103,7 +103,8 @@ def balance(t,f,x):
                 if j.type == "UNKNOWN":
                     f.append(i)
                 else:
-                    raise TypeMatchingError("Types do not match for %s, %s in %s node %d" % (i,j,t.nodeType, t.nodenumber))
+#                    raise TypeMatchingError("Types do not match for %s, %s in %s node %d" % (i,j,t.nodeType, t.nodenumber))
+                    pass
         return balance(t,f,x)
 
 def variable_check_query(t):
