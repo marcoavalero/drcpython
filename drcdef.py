@@ -195,7 +195,12 @@ def p_query_nodebug(p):
     p[0]  = DRC("NODEBUG")
     p[0].predicateName = p[1]
     print "Debug mode disabled\n"
-    
+
+def p_query_printing(p):
+    'query : PRINTING'
+    p[0]  = DRC("PRINTING")
+    p[0].predicateName = p[1]
+    print "something"
 def p_error(p):
     raise DrcError("Syntax error" + str(p))
 

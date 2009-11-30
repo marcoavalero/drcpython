@@ -17,6 +17,7 @@ reserved = {
     'exit' : 'EXIT',
     'use' : 'USE',
     'help' : 'HELP',
+    'printing' : 'PRINTING',
     'debug' : 'DEBUG',
     'nodebug' : 'NODEBUG',
     'database' : 'DATABASE',

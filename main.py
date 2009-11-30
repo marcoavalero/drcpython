@@ -20,6 +20,7 @@ def main():
     except getopt.GetoptError:
         sys.exit(2)
     debug = False
+    printing = False
     dbname = "modb"
     username = ''
     password = ''
@@ -67,10 +68,13 @@ def main():
                 dbtree.print_node() 
                 t.nodeType = 'null'
             else:
-                if (t.nodeType == 'USEDB' or t.nodeType == 'HELP' or t.nodeType == 'DEBUG' or t.nodeType == 'NODEBUG'):
+                if (t.nodeType == 'USEDB' or t.nodeType == 'HELP' or t.nodeType == 'DEBUG' or t.nodeType == 'NODEBUG' or t.nodeType == 'PRINTING'):
                     if (t.nodeType == 'USEDB'):
                         dbname = t.predicateName
                         dbtree = initializeDB(dbname, host_serv, username, password)
+                    if (t.nodeType == 'PRINTING'):
+                        printing = not printing
+                        print "Printing mode " , printing
                     if (t.nodeType == 'DEBUG'):
                         debug = True
                     if (t.nodeType == 'NODEBUG'):
@@ -90,8 +94,10 @@ def main():
                         safe.safety_check(t)
     	                query.gen_query(t,dbtree)
                         t.query = t.children[0].query
-                        #print "\nSQL QUERY:\n"
-                        #print t.query
+                        if printing: 
+                            t.print_node()
+                            print "\nSQL QUERY:\n"
+                            print t.query
                         print "\nRESULTS:\n"
                         query.execute_query(t,dbname, host_serv, username, password)
                         t.nodeType = 'null'
