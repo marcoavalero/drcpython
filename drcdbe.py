@@ -17,7 +17,7 @@ def initializeDB(dbname, host_serv, username, password):
     cursor.execute( 'show tables' )
     listoftables = cursor.fetchall()
     for tablename in listoftables :
-        tablenames.append(tablename[0])
+        tablenames.append(tablename[0].lower())
 
     for tablename in tablenames :
         cursor1.execute("show columns from %s" %(tablename))
@@ -234,11 +234,11 @@ def gen_and_query(drctree):
     for child in drctree.children:
 #        print child.nodeType
         if child.nodeType == "Comparison":
-            if type(child.rightOperand[0]) == Str_Con or type(child.rightOperand[0]) == Int_Con:
+            if type(child.rightOperand[0]) == Str_Con or type(child.rightOperand[0]) == Int_Con or type(child.rightOperand[0]) == Dec_Con:
                 if type(child.leftOperand[0]) == DRC_Var:
                     WHERE = WHERE + " and TEMP" + set_queryvar_for_node(drctree,child.leftOperand[0]) + "." + child.leftOperand[0].idid +" "+ child.operator[0] +" " + str(child.rightOperand[0].data)
                     
-            if type(child.leftOperand[0]) == Str_Con or type(child.leftOperand[0]) == Int_Con:
+            if type(child.leftOperand[0]) == Str_Con or type(child.leftOperand[0]) == Int_Con or type(child.leftOperand[0]) == Dec_Con:
                 if type(child.rightOperand[0]) == DRC_Var:
                     WHERE = WHERE + " and " + str(child.leftOperand[0].data) +" "+ child.operator[0] +" " + "TEMP" + set_queryvar_for_node(drctree,child.rightOperand[0]) + "." + child.leftOperand[0].idid
 #MIGHT NEED REVIEW HERE
