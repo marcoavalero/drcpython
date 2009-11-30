@@ -17,7 +17,7 @@ def initializeDB(dbname, host_serv, username, password):
     cursor.execute( 'show tables' )
     listoftables = cursor.fetchall()
     for tablename in listoftables :
-        tablenames.append(tablename[0].lower())
+        tablenames.append(tablename[0])
 
     for tablename in tablenames :
         cursor1.execute("show columns from %s" %(tablename))
